@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appsettings-configmap-{{ .Release.Name }}
+data:
+  appsettings.json: |-
+    {
+        "urls": "{{ .Values.environment.urls }}",
+        "AppSettings": {
+            "KubernetesSettings": {
+            "DeployedOnCluster": true,
+            "Namespace": "{{ .Values.environment.namespace }}",
+            "CayleyDeployment": {
+                "Alpha": {
+                    "ReleaseName": "{{ .Values.environment.cayleyDeployment.alpha.releaseName }}",
+                    "Host": "{{ .Values.environment.cayleyDeployment.alpha.host }}",
+                    "Port": "{{ .Values.environment.cayleyDeployment.alpha.port }}"
+                    },
+                    "Beta": {
+                    "ReleaseName": "{{ .Values.environment.cayleyDeployment.beta.releaseName }}",
+                    "Host": "{{ .Values.environment.cayleyDeployment.beta.host }}",
+                    "Port": "{{ .Values.environment.cayleyDeployment.beta.port }}"
+                    },
+                    "ConfigMapName": "cayley-config-yaml",
+                    "MaxReplication": "{{ .Values.environment.cayleyDeployment.maxReplication }}"
+                },
+            "BuilderDeployment": {
+                    "ReleaseName": "{{ .Values.environment.builderDeployment.releaseName }}",
+                    "ConfigMapName": "appsettings-configmap",
+                    "Host": "{{ .Values.environment.builderDeployment.host }}",
+                    "Port": "{{ .Values.environment.builderDeployment.port }}",
+                    "CacheEndpoint": "api/buildcache/",
+                    "PollingWaitTime": "20000",
+                    "PollingMaxAttempts": "10",
+                    "PreloadMaxAttempts": "5"
+                },
+            "CoreDeployment": {
+                    "ReleaseName": "{{ .Values.environment.coreDeployment.releaseName }}",
+                    "ConfigMapName": "appsettings-configmap"
+                },
+            "Jaeger": {
+                    "JAEGER_SERVICE_NAME": "cs-data-management"
+                }
+            }
+        },
+        "Serilog": {
+            "MinimumLevel": {
+            "Default": "{{ .Values.environment.logLevel }}",
+            "Override": {
+                    "Microsoft": "Error",
+                    "System": "Error"
+                }
+            },
+            "WriteTo": [
+                {
+                    "Name": "File",
+                    "Args": {
+                    "Enabled": {{ .Values.environment.logToFile }},
+                    "FilePath": "{{ .Values.environment.logFileLocation }}/CatalogServicesDataManagement-.txt"
+                    }
+                }
+            ]
+        },
+        "AllowedHosts": "*",
+        "DataAccess": {
+            "GraphDatabase": {
+            "Host": "{{ .Values.environment.cayleyDeployment.alpha.host }}",
+            "Port": "{{ .Values.environment.cayleyDeployment.alpha.port }}",
+            "IsContainerized": true,
+            "Path":  "{{ .Values.environment.cayleyDeployment.path }}",
+            "PollingWaitTime": "10000",
+            "PollingMaxAttempts": "10"
+            }
+        },
+        "Kafka": {
+            "Enable": {{ .Values.kafka.enable }},
+            "TopicSuffix": "{{ .Values.kafka.topicSuffix }}",
+            "ProducerConfig": {
+                "ClientId": "{{ .Values.kafka.producerConfig.clientId }}",
+                "BootstrapServers": "{{ .Values.kafka.producerConfig.bootstrapServers }}",
+                "SecurityProtocol": "{{ .Values.kafka.producerConfig.securityProtocol }}",
+                "Acks": "{{ .Values.kafka.producerConfig.acks }}",
+                "EnableSslCertificateVerification": {{ .Values.kafka.producerConfig.enableSslCertificateVerification }},
+                "SslEndpointIdentificationAlgorithm": "{{ .Values.kafka.producerConfig.sslEndpointIdentificationAlgorithm }}",
+                "SaslUsername": {{ .Values.kafka.producerConfig.saslUsername | quote | default "null" }},
+                "SaslPassword": {{ .Values.kafka.producerConfig.saslPassword  | quote | default "null" }},
+                "SaslMechanism": {{ .Values.kafka.producerConfig.saslMechanism | quote | default "null" }}
+            }
+        }
+    }

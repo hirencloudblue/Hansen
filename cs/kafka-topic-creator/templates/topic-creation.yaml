@@ -1,0 +1,95 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "kafka-topic-creator.fullname" . }}
+  labels:
+    {{- include "kafka-topic-creator.labels" . | nindent 4 }}
+spec:
+  activeDeadlineSeconds: 180
+  template:
+    metadata:
+      labels:
+        {{- include "kafka-topic-creator.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "kafka-topic-creator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      restartPolicy: OnFailure
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+          - /bin/bash
+          - -c
+          - |
+             {{- range $topic := .Values.topics }}
+              {{- if ne $.Values.protocol "none" }}
+              /opt/bitnami/kafka/bin/kafka-topics.sh --create \
+              --if-not-exists \
+              --bootstrap-server {{ $.Values.zookeeperConnectionString | quote }} \
+              --topic {{ $topic.name | quote }} \
+              --replication-factor {{ $topic.replicationFactor | quote }} \
+              --partitions {{ $topic.partitions | quote }} \
+              --command-config "/opt/bitnami/kafka/config/client.properties"
+              {{- else }}
+              /opt/bitnami/kafka/bin/kafka-topics.sh --create \
+              --if-not-exists \
+              --bootstrap-server {{ $.Values.zookeeperConnectionString | quote }} \
+              --topic {{ $topic.name | quote }} \
+              --replication-factor {{ $topic.replicationFactor | quote }} \
+              --partitions {{ $topic.partitions | quote }}
+              {{- end }}
+            {{- end }}
+          env:
+            - name: TMPDIR
+              value: /tmp
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- if eq .Values.protocol "SSL" }}
+            - mountPath: /opt/bitnami/kafka/config/client.properties
+              name: client-properties
+              subPath: client.properties
+            {{- end }}
+            {{- if eq .Values.protocol "SASL_SSL" }}
+            - mountPath: /opt/bitnami/kafka/config/client.properties
+              name: confluent-properties
+              subPath: confluent.properties
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- if eq $.Values.protocol "SSL" }}
+        - name: client-properties
+          configMap:
+            name: client-properties
+        {{- end }}
+        {{- if eq $.Values.protocol "SASL_SSL" }}
+        - name: confluent-properties
+          configMap:
+            name: confluent-properties
+        {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- with .Values.backoffLimit }}
+  backoffLimit: {{ toYaml . }}
+{{- end }}
+{{- with .Values.completions }}
+  completions: {{ toYaml . }}
+{{- end }}
+{{- with .Values.parallelism }}
+  parallelism: {{ toYaml . }}
+{{- end }}

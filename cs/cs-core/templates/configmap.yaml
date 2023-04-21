@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appsettings-configmap-{{ .Release.Name }}
+data:
+  appsettings.json: |-
+    {
+      "urls": "{{ .Values.environment.urls }}",
+      "AllowedHosts": "*",
+      "LicenseLocation": "{{ .Values.environment.licensePath | default "/app/cs-license.csdlic" }}",
+      "server": {
+        "showPrivateEndpoints": false,
+        "MaxRequestQueueSize": {{ .Values.config.server.maxRequestQueueSize }}
+      },
+      "Security": {
+        "Enable": {{ .Values.config.Security.Enable }},
+        "Domain": "{{ .Values.config.Security.Domain }}",
+        "ApiIdentifier": "{{ .Values.config.Security.ApiIdentifier }}",
+        "RequireHttpsMetadata": {{ .Values.config.Security.RequiresHttpsMetadata }},
+        "ScopeClaimKey": "{{ .Values.config.Security.ScopeClaimKey }}"
+      },
+      "EventHandler": {
+        "IsEnabled": {{ .Values.config.EventHandler.IsEnabled }},
+        "File": [
+          {
+            "Name": "{{ .Values.config.EventHandler.File.Name }}",
+            "FilePath": "{{ .Values.config.EventHandler.File.FilePath }}"
+          }
+        ],
+        "Http": [
+          {
+            "Name": "{{ .Values.config.EventHandler.Http.Name }}",
+            "Uri": "{{ .Values.config.EventHandler.Http.Uri }}"
+          }
+        ]
+      },
+      "DataAccess": {
+        "GraphDatabase": {
+          "Host": "{{ .Values.environment.data.host }}",
+          "Port": "{{ .Values.environment.data.port }}",
+          "Path": "{{ .Values.environment.data.path }}",
+          "IsContainerized": true,
+          "PollingWaitTime": "20000",
+          "PollingMaxAttempts": "10"
+        }
+      },
+      "Serilog": {
+          "MinimumLevel": {
+          "Default": "{{ .Values.environment.logLevel }}",
+          "Override": {
+                  "Microsoft": "Error",
+                  "System": "Error"
+              }
+          },
+          "WriteTo": [
+              {
+                  "Name": "File",
+                  "Args": {
+                    "Enabled": {{ .Values.environment.logToFile }},
+                    "FilePath": "{{ .Values.environment.logFileLocation }}/CatalogServicesCore-.txt"
+                  }
+              }
+          ]
+      },
+      "Formatting": {
+        "DefaultResponseFormat": "{{ .Values.config.Formatting.DefaultResponseFormat }}"
+      },
+      "Caching": {
+        "PersistedCache": {
+          "Enable": true,
+          "Location": "{{ .Values.config.Caching.PersistedCache.Location }}"
+        },
+        "ResponseCacheEnable": {{ .Values.config.Caching.ResponseCacheEnable }},
+        "InternalCacheEnable": {{ .Values.config.Caching.InternalCacheEnable }},
+        "DistributedCache": {
+          "Enable": {{ .Values.config.Caching.DistributedCache.Enable }},
+          "Redis": {{ .Values.config.Caching.DistributedCache.Enable }},
+          "MemCached": false,
+          "SlidingExpirationInHours": "{{ .Values.config.Caching.DistributedCache.SlidingExpirationInHours }}",
+          "Server": "{{ .Values.config.Caching.DistributedCache.Host }}",
+          "ConnectTimeout": "{{ .Values.config.Caching.DistributedCache.ConnectTimeout }}",
+          "Ssl": "{{ .Values.config.Caching.DistributedCache.Ssl }}",
+          "SslProtocols": "{{ .Values.config.Caching.DistributedCache.SslProtocols }}",
+          "SslHost": "{{ .Values.config.Caching.DistributedCache.SslHost }}"
+        }
+      },
+      "RequestDefaults": {
+        "EntitiesWith": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.EntitiesWith.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.EntitiesWith.EntitySummaryOnly }}
+        },
+        "Entities": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.Entities.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.Entities.EntitySummaryOnly }}
+        },
+        "EntitiesFactElementFilter": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.EntitiesFactElementFilter.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.EntitiesFactElementFilter.EntitySummaryOnly }}
+        },
+        "EntitiesClassifications": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.EntitiesClassifications.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.EntitiesClassifications.EntitySummaryOnly }}
+        },
+        "EntitiesWithClassificationsAndCharacteristics": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.EntitiesWithClassificationsAndCharacteristics.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.EntitiesWithClassificationsAndCharacteristics.EntitySummaryOnly }}
+        },
+        "EntitiesParents": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.EntitiesParents.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.EntitiesParents.EntitySummaryOnly }}
+        },
+        "CategoriesEntities": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.CategoriesEntities.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.CategoriesEntities.EntitySummaryOnly }}
+        },
+        "TypesEntities": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.TypesEntities.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.TypesEntities.EntitySummaryOnly }}
+        },
+        "RelatedEntities": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.RelatedEntities.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.RelatedEntities.EntitySummaryOnly }}
+        },
+        "CommercialEntities": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.CommercialEntities.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.CommercialEntities.EntitySummaryOnly }}
+        },
+        "FindWithParameters": {
+          "TopEntityOnly": {{ .Values.config.RequestDefaults.FindWithParameters.TopEntityOnly }},
+          "EntitySummaryOnly": {{ .Values.config.RequestDefaults.FindWithParameters.EntitySummaryOnly }}
+        }
+      },
+      "DataManagementHost": "{{ .Values.environment.dataManagementConfig.host }}",
+      "DataManagementPort": "{{ .Values.environment.dataManagementConfig.port }}",
+      "Jaeger": {
+        "JAEGER_SERVICE_NAME": "cs-core"
+      }
+    }

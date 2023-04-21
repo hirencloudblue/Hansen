@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appsettings-configmap-{{ .Release.Name }}
+data:
+  appsettings.json: |-
+    {
+        "urls": "{{ .Values.environment.urls }}",
+        "Serilog": {
+            "MinimumLevel": {
+            "Default": "{{ .Values.environment.logLevel }}",
+            "Override": {
+                    "Microsoft": "Error",
+                    "System": "Error"
+                }
+            },
+            "WriteTo": [
+                {
+                    "Name": "File",
+                    "Args": {
+                    "Enabled": {{ .Values.environment.logToFile }},
+                    "FilePath": "{{ .Values.environment.logFileLocation }}/CatalogServicesBuilder-.txt"
+                    }
+                }
+            ]
+        },
+        "AllowedHosts": "*",
+        "DataAccess": {
+            "GraphDatabase": {
+            "Host": "{{ .Values.environment.data.host }}",
+            "Path": "{{ .Values.environment.data.path }}",
+            "Port": "{{ .Values.environment.data.port }}",
+            "IsContainerized": true,
+            "PollingWaitTime": "20000",
+            "PollingMaxAttempts": "10"
+            }
+        },
+        "Caching": {
+            "PersistedCache": {
+                "Enable": true,
+                "CacheSpecificationTypes": "COMPILED,TECHNICAL,COMMERCIAL",
+                "Location": "{{ .Values.environment.cacheLocation }}"
+            }
+        },
+        "Jaeger": {
+            "JAEGER_SERVICE_NAME": "cs-builder"
+        }
+    }

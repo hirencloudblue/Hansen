@@ -1,0 +1,46 @@
+replicaCount: 1
+image:
+  repository: 774303220817.dkr.ecr.eu-west-1.amazonaws.com/catalog-services/cs-cayley
+  tag: 5.1.0
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+nameOverride: ''
+fullnameOverride: ''
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ''
+podAnnotations: {}
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 64210
+  enableNodePort: false
+deployment:
+  containerPort: 64210
+ingress:
+  enabled: true
+  className: ''
+  annotations: {}
+  hosts:
+  - host: cs-cayley
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: []
+resources:
+  requests:
+    cpu: 100m
+    memory: 128M
+nodeSelector: {}
+tolerations: []
+affinity: {}
+environment:
+  volumePvcName: cs-storage-pvc
+  volumeName: pvol
+config:
+  dataPath: /cayley/data.nq

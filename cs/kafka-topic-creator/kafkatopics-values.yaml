@@ -1,0 +1,53 @@
+image:
+  repository: bitnami/kafka
+  tag: latest
+  imagePullPolicy: IfNotPresent
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+nodeSelector:
+  kubernetes.io/os: linux
+tolerations: []
+affinity: {}
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+backoffLimit: 3
+completions: 1
+parallelism: 1
+# topics:                    # Configure the list of topics to be created on Kafka.
+#   - name: CS-RefreshStatus # The name of the topic needs to be created on Kafka. 
+#                            # Note: you can configure a suffix in cs-data-management values.yaml
+#                            # These topic names should be updated to include that suffix.
+#                            # If a suffix is not provided in cs-data-management values.yaml, 
+#                            # the Kubernetes namespace will be appended, e.g. -default
+#     replicationFactor: 1   # The replication factor to ensure high availability of the message in this topic.
+#     partitions: 10         # The number of partitions for the this topic.
+topics:
+  - name: CS-PreloadStatus-default
+    replicationFactor: 1
+    partitions: 10
+  - name: CS-RefreshStatus-default
+    replicationFactor: 1
+    partitions: 10
+zookeeperConnectionString: z-2.cnmskcsddev2.npjjqs.c3.kafka.us-east-2.amazonaws.com:2181,z-1.cnmskcsddev2.npjjqs.c3.kafka.us-east-2.amazonaws.com:2181,z-3.cnmskcsddev2.npjjqs.c3.kafka.us-east-2.amazonaws.com:2181
+protocol: SSL
+saslUsername: dummy
+saslPassword: dummy
+saslMechanism: PLAIN
+dnsLookup: use_all_dns_ips

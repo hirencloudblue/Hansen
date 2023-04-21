@@ -1,0 +1,5 @@
+{{- range $pv := .Values.persistentVolumes }}
+{{- range $sc := $pv.storageClass }}
+Creates a storage class named {{ $sc.name }} and a PVC named {{ $pv.name }}
+{{- end }}
+{{- end }}

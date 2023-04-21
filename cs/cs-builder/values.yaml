@@ -1,0 +1,59 @@
+replicaCount: 1
+image:
+  repository: 774303220817.dkr.ecr.eu-west-1.amazonaws.com/catalog-services/cs-builder
+  pullPolicy: IfNotPresent
+  tag: 5.1.0
+imagePullSecrets: []
+nameOverride: ''
+fullnameOverride: ''
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ''
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 9002
+  enableNodePort: false
+ingress:
+  enabled: true
+  className: ''
+  annotations: {}
+  hosts:
+  - host: cs-builder
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: []
+resources:
+  limits:
+    cpu: 2000m
+  requests:
+    cpu: 500m
+    memory: 512M
+podAnnotations:
+  prometheus.io/scrape: 'true'
+  prometheus.io/port: '9002'
+  prometheus.io/path: /metrics
+  sidecar.jaegertracing.io/inject: 'true'
+nodeSelector: {}
+tolerations: []
+affinity: {}
+environment:
+  data:
+    host: cs-cayley-a
+    port: '64210'
+    path: /data/EmptyData/data.nq
+  Jaeger:
+    AgentPort: 6831
+  cacheLocation: /data/
+  logLevel: Information
+  logToFile: false
+  logFileLocation: /data/Logs/cs-builder
+  urls: http://*:9002
+  volumePvcName: cs-storage-pvc
+  volumeName: pvol

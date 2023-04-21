@@ -1,0 +1,482 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "image",
+        "nameOverride",
+        "fullnameOverride",
+        "serviceAccount",
+        "resources",
+        "nodeSelector",
+        "tolerations",
+        "affinity",
+        "securityContext",
+        "backoffLimit",
+        "completions",
+        "parallelism",
+        "topics",
+        "zookeeperConnectionString",
+        "protocol",
+        "saslUsername",
+        "saslPassword",
+        "saslMechanism",
+        "dnsLookup"
+    ],
+    "properties": {
+        "image": {
+            "type": "object",
+            "default": {},
+            "title": "The image Schema",
+            "required": [
+                "repository",
+                "tag",
+                "imagePullPolicy"
+            ],
+            "properties": {
+                "repository": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The repository Schema",
+                    "examples": [
+                        "bitnami/kafka"
+                    ]
+                },
+                "tag": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The tag Schema",
+                    "examples": [
+                        "latest"
+                    ]
+                },
+                "imagePullPolicy": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The imagePullPolicy Schema",
+                    "examples": [
+                        "IfNotPresent"
+                    ]
+                }
+            },
+            "examples": [{
+                "repository": "bitnami/kafka",
+                "tag": "latest",
+                "imagePullPolicy": "IfNotPresent"
+            }]
+        },
+        "nameOverride": {
+            "type": "string",
+            "default": "",
+            "title": "The nameOverride Schema",
+            "examples": [
+                ""
+            ]
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "default": "",
+            "title": "The fullnameOverride Schema",
+            "examples": [
+                ""
+            ]
+        },
+        "serviceAccount": {
+            "type": "object",
+            "default": {},
+            "title": "The serviceAccount Schema",
+            "required": [
+                "create",
+                "annotations",
+                "name"
+            ],
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "The create Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "name": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The name Schema",
+                    "examples": [
+                        ""
+                    ]
+                }
+            },
+            "examples": [{
+                "create": false,
+                "annotations": {},
+                "name": ""
+            }]
+        },
+        "resources": {
+            "type": "object",
+            "default": {},
+            "title": "The resources Schema",
+            "required": [
+                "limits",
+                "requests"
+            ],
+            "properties": {
+                "limits": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The limits Schema",
+                    "required": [
+                        "cpu",
+                        "memory"
+                    ],
+                    "properties": {
+                        "cpu": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The cpu Schema",
+                            "examples": [
+                                "200m"
+                            ]
+                        },
+                        "memory": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The memory Schema",
+                            "examples": [
+                                "256Mi"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "cpu": "200m",
+                        "memory": "256Mi"
+                    }]
+                },
+                "requests": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The requests Schema",
+                    "required": [
+                        "cpu",
+                        "memory"
+                    ],
+                    "properties": {
+                        "cpu": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The cpu Schema",
+                            "examples": [
+                                "100m"
+                            ]
+                        },
+                        "memory": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The memory Schema",
+                            "examples": [
+                                "128Mi"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "cpu": "100m",
+                        "memory": "128Mi"
+                    }]
+                }
+            },
+            "examples": [{
+                "limits": {
+                    "cpu": "200m",
+                    "memory": "256Mi"
+                },
+                "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                }
+            }]
+        },
+        "nodeSelector": {
+            "type": "object",
+            "default": {},
+            "title": "The nodeSelector Schema",
+            "required": [
+                "kubernetes.io/os"
+            ],
+            "properties": {
+                "kubernetes.io/os": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The kubernetes.io/os Schema",
+                    "examples": [
+                        "linux"
+                    ]
+                }
+            },
+            "examples": [{
+                "kubernetes.io/os": "linux"
+            }]
+        },
+        "tolerations": {
+            "type": "array",
+            "default": [],
+            "title": "The tolerations Schema",
+            "items": {},
+            "examples": [
+                []
+            ]
+        },
+        "affinity": {
+            "type": "object",
+            "default": {},
+            "title": "The affinity Schema",
+            "required": [],
+            "properties": {},
+            "examples": [{}]
+        },
+        "securityContext": {
+            "type": "object",
+            "default": {},
+            "title": "The securityContext Schema",
+            "required": [
+                "runAsUser",
+                "runAsGroup",
+                "fsGroup"
+            ],
+            "properties": {
+                "runAsUser": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The runAsUser Schema",
+                    "examples": [
+                        1000
+                    ]
+                },
+                "runAsGroup": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The runAsGroup Schema",
+                    "examples": [
+                        3000
+                    ]
+                },
+                "fsGroup": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The fsGroup Schema",
+                    "examples": [
+                        2000
+                    ]
+                }
+            },
+            "examples": [{
+                "runAsUser": 1000,
+                "runAsGroup": 3000,
+                "fsGroup": 2000
+            }]
+        },
+        "backoffLimit": {
+            "type": "integer",
+            "default": 0,
+            "title": "The backoffLimit Schema",
+            "examples": [
+                3
+            ]
+        },
+        "completions": {
+            "type": "integer",
+            "default": 0,
+            "title": "The completions Schema",
+            "examples": [
+                1
+            ]
+        },
+        "parallelism": {
+            "type": "integer",
+            "default": 0,
+            "title": "The parallelism Schema",
+            "examples": [
+                1
+            ]
+        },
+        "topics": {
+            "type": "array",
+            "default": [],
+            "title": "The topics Schema",
+            "items": {
+                "type": "object",
+                "title": "A Schema",
+                "required": [
+                    "name",
+                    "replicationFactor",
+                    "partitions"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "The name Schema",
+                        "examples": [
+                            "CS-PreloadStatus-default",
+                            "CS-RefreshStatus-default"
+                        ]
+                    },
+                    "replicationFactor": {
+                        "type": "integer",
+                        "title": "The replicationFactor Schema",
+                        "examples": [
+                            1
+                        ]
+                    },
+                    "partitions": {
+                        "type": "integer",
+                        "title": "The partitions Schema",
+                        "examples": [
+                            10
+                        ]
+                    }
+                },
+                "examples": [{
+                    "name": "CS-PreloadStatus-default",
+                    "replicationFactor": 1,
+                    "partitions": 10
+                },
+                {
+                    "name": "CS-RefreshStatus-default",
+                    "replicationFactor": 1,
+                    "partitions": 10
+                }]
+            },
+            "examples": [
+                [{
+                    "name": "CS-PreloadStatus-default",
+                    "replicationFactor": 1,
+                    "partitions": 10
+                },
+                {
+                    "name": "CS-RefreshStatus-default",
+                    "replicationFactor": 1,
+                    "partitions": 10
+                }]
+            ]
+        },
+        "zookeeperConnectionString": {
+            "type": "string",
+            "default": "",
+            "title": "The zookeeperConnectionString Schema",
+            "examples": [
+                "kafka.default.svc.cluster.local:9092"
+            ]
+        },
+        "protocol": {
+            "type": "string",
+            "default": "none",
+            "title": "The protocol Schema",
+            "enum": ["none","SSL","SASL_SSL"],
+            "examples": [
+                "none",
+                "SSL",
+                "SASL_SSL"
+            ]
+        },
+        "saslUsername": {
+            "type": ["string","null"],
+            "default": null,
+            "title": "The saslUsername Schema",
+            "examples": [
+                null
+            ]
+        },
+        "saslPassword": {
+            "type": ["string","null"],
+            "default": null,
+            "title": "The saslPassword Schema",
+            "examples": [
+                null
+            ]
+        },
+        "saslMechanism": {
+            "type": ["string","null"],
+            "default": null,
+            "title": "The saslMechanism Schema",
+            "enum": [null,"","PLAIN","SCRAM-SHA-256","SCRAM-SHA-512"],
+            "examples": [
+                "",
+                "PLAIN",
+                "SCRAM-SHA-256",
+                "SCRAM-SHA-512"
+            ]
+        },
+        "dnsLookup": {
+            "type": ["string","null"],
+            "default": "use_all_dns_ips",
+            "title": "The dnsLookup Schema",
+            "examples": [
+                "use_all_dns_ips"
+            ]
+        }
+    },
+    "examples": [{
+        "image": {
+            "repository": "bitnami/kafka",
+            "tag": "latest",
+            "imagePullPolicy": "IfNotPresent"
+        },
+        "nameOverride": "",
+        "fullnameOverride": "",
+        "serviceAccount": {
+            "create": false,
+            "annotations": {},
+            "name": ""
+        },
+        "resources": {
+            "limits": {
+                "cpu": "200m",
+                "memory": "256Mi"
+            },
+            "requests": {
+                "cpu": "100m",
+                "memory": "128Mi"
+            }
+        },
+        "nodeSelector": {
+            "kubernetes.io/os": "linux"
+        },
+        "tolerations": [],
+        "affinity": {},
+        "securityContext": {
+            "runAsUser": 1000,
+            "runAsGroup": 3000,
+            "fsGroup": 2000
+        },
+        "backoffLimit": 3,
+        "completions": 1,
+        "parallelism": 1,
+        "topics": [{
+            "name": "CS-PreloadStatus-default",
+            "replicationFactor": 1,
+            "partitions": 10
+        },
+        {
+            "name": "CS-RefreshStatus-default",
+            "replicationFactor": 1,
+            "partitions": 10
+        }],
+        "zookeeperConnectionString": "kafka.default.svc.cluster.local:9092",
+        "protocol": "none",
+        "saslUsername": null,
+        "saslPassword": null,
+        "saslMechanism": null,
+        "dnsLookup": null
+    }]
+}

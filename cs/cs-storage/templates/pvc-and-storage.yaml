@@ -1,0 +1,74 @@
+{{- range $pv := .Values.persistentVolumes }}
+{{- range $local := $pv.local }}
+{{- range $efs := $pv.efs }}
+{{- if $local.create }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $local.name }}
+  labels:
+    type: local
+spec:
+  storageClassName: {{ $local.storageClassName }}
+  capacity:
+    storage: {{ $local.storage }}
+  accessModes:
+    - {{ $local.accessMode }}
+  hostPath:
+    path: {{ $local.path }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $pv.name }}
+spec:
+  accessModes:
+    - {{ $local.accessMode }}
+  resources:
+    requests:
+      storage: {{ $pv.storage }}
+  storageClassName: {{ $local.storageClassName }}
+  volumeName: {{ $local.name }}
+{{- end }}
+---
+{{ if $efs.create }}
+{{- $storageClass := (lookup "storage.k8s.io/v1" "StorageClass" "" $efs.storageClassName) }}
+{{ if not $storageClass }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ $efs.storageClassName }}
+provisioner: {{ $efs.provisioner }}
+{{ end }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $efs.name }}
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - {{ $efs.accessMode }}
+  persistentVolumeReclaimPolicy: {{ $efs.reclaimPolicy }}
+  storageClassName: {{ $efs.storageClassName }}
+  csi:
+    driver: {{ $efs.provisioner }}
+    volumeHandle: {{ $efs.fileSystemId }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $pv.name }}
+spec:
+  accessModes:
+    - {{ $efs.accessMode }}
+  resources:
+    requests:
+      storage: {{ $pv.storage }}
+  storageClassName: {{ $efs.storageClassName }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

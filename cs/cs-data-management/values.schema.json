@@ -1,0 +1,1089 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "replicaCount",
+        "image",
+        "imagePullSecrets",
+        "nameOverride",
+        "fullnameOverride",
+        "serviceAccount",
+        "podSecurityContext",
+        "securityContext",
+        "service",
+        "deployment",
+        "ingress",
+        "resources",
+        "podAnnotations",
+        "nodeSelector",
+        "tolerations",
+        "affinity",
+        "kafka",
+        "environment"
+    ],
+    "properties": {
+        "replicaCount": {
+            "type": "integer",
+            "default": 0,
+            "title": "The replicaCount Schema",
+            "examples": [
+                1
+            ]
+        },
+        "image": {
+            "type": "object",
+            "default": {},
+            "title": "The image Schema",
+            "required": [
+                "repository",
+                "pullPolicy",
+                "tag"
+            ],
+            "properties": {
+                "repository": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The repository Schema",
+                    "examples": [
+                        "cs-data-management"
+                    ]
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The pullPolicy Schema",
+                    "examples": [
+                        "IfNotPresent"
+                    ]
+                },
+                "tag": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The tag Schema",
+                    "examples": [
+                        "latest"
+                    ]
+                }
+            },
+            "examples": [{
+                "repository": "cs-data-management",
+                "pullPolicy": "IfNotPresent",
+                "tag": "latest"
+            }]
+        },
+        "imagePullSecrets": {
+            "type": "array",
+            "default": [],
+            "title": "The imagePullSecrets Schema",
+            "items": {},
+            "examples": [
+                []
+            ]
+        },
+        "nameOverride": {
+            "type": "string",
+            "default": "",
+            "title": "The nameOverride Schema",
+            "examples": [
+                ""
+            ]
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "default": "",
+            "title": "The fullnameOverride Schema",
+            "examples": [
+                ""
+            ]
+        },
+        "serviceAccount": {
+            "type": "object",
+            "default": {},
+            "title": "The serviceAccount Schema",
+            "required": [
+                "create",
+                "annotations",
+                "name"
+            ],
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "The create Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "name": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The name Schema",
+                    "examples": [
+                        "dms-sa"
+                    ]
+                }
+            },
+            "examples": [{
+                "create": false,
+                "annotations": {},
+                "name": "dms-sa"
+            }]
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "default": {},
+            "title": "The podSecurityContext Schema",
+            "required": [
+                "runAsUser",
+                "runAsGroup",
+                "fsGroup"
+            ],
+            "properties": {
+                "runAsUser": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The runAsUser Schema",
+                    "examples": [
+                        1000
+                    ]
+                },
+                "runAsGroup": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The runAsGroup Schema",
+                    "examples": [
+                        3000
+                    ]
+                },
+                "fsGroup": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The fsGroup Schema",
+                    "examples": [
+                        2000
+                    ]
+                }
+            },
+            "examples": [{
+                "runAsUser": 1000,
+                "runAsGroup": 3000,
+                "fsGroup": 2000
+            }]
+        },
+        "securityContext": {
+            "type": "object",
+            "default": {},
+            "title": "The securityContext Schema",
+            "required": [],
+            "properties": {},
+            "examples": [{}]
+        },
+        "service": {
+            "type": "object",
+            "default": {},
+            "title": "The service Schema",
+            "required": [
+                "type",
+                "port"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The type Schema",
+                    "examples": [
+                        "ClusterIP"
+                    ]
+                },
+                "port": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The port Schema",
+                    "examples": [
+                        9004
+                    ]
+                }
+            },
+            "examples": [{
+                "type": "ClusterIP",
+                "port": 9004
+            }]
+        },
+        "deployment": {
+            "type": "object",
+            "default": {},
+            "title": "The deployment Schema",
+            "required": [
+                "containerPort"
+            ],
+            "properties": {
+                "containerPort": {
+                    "type": "integer",
+                    "default": 0,
+                    "title": "The containerPort Schema",
+                    "examples": [
+                        9004
+                    ]
+                }
+            },
+            "examples": [{
+                "containerPort": 9004
+            }]
+        },
+        "ingress": {
+            "type": "object",
+            "default": {},
+            "title": "The ingress Schema",
+            "required": [
+                "enabled",
+                "className",
+                "annotations",
+                "hosts",
+                "tls"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "The enabled Schema",
+                    "examples": [
+                        true
+                    ]
+                },
+                "className": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The className Schema",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "annotations": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The annotations Schema",
+                    "required": [],
+                    "properties": {},
+                    "examples": [{}]
+                },
+                "hosts": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The hosts Schema",
+                    "items": {
+                        "type": "object",
+                        "default": {},
+                        "title": "A Schema",
+                        "required": [
+                            "host",
+                            "paths"
+                        ],
+                        "properties": {
+                            "host": {
+                                "type": "string",
+                                "default": "",
+                                "title": "The host Schema",
+                                "examples": [
+                                    "cs-data-management"
+                                ]
+                            },
+                            "paths": {
+                                "type": "array",
+                                "default": [],
+                                "title": "The paths Schema",
+                                "items": {
+                                    "type": "object",
+                                    "default": {},
+                                    "title": "A Schema",
+                                    "required": [
+                                        "path",
+                                        "pathType"
+                                    ],
+                                    "properties": {
+                                        "path": {
+                                            "type": "string",
+                                            "default": "",
+                                            "title": "The path Schema",
+                                            "examples": [
+                                                "/"
+                                            ]
+                                        },
+                                        "pathType": {
+                                            "type": "string",
+                                            "default": "",
+                                            "title": "The pathType Schema",
+                                            "examples": [
+                                                "ImplementationSpecific"
+                                            ]
+                                        }
+                                    },
+                                    "examples": [{
+                                        "path": "/",
+                                        "pathType": "ImplementationSpecific"
+                                    }]
+                                },
+                                "examples": [
+                                    [{
+                                        "path": "/",
+                                        "pathType": "ImplementationSpecific"
+                                    }]
+                                ]
+                            }
+                        },
+                        "examples": [{
+                            "host": "cs-data-management",
+                            "paths": [{
+                                "path": "/",
+                                "pathType": "ImplementationSpecific"
+                            }]
+                        }]
+                    },
+                    "examples": [
+                        [{
+                            "host": "cs-data-management",
+                            "paths": [{
+                                "path": "/",
+                                "pathType": "ImplementationSpecific"
+                            }]
+                        }]
+                    ]
+                },
+                "tls": {
+                    "type": "array",
+                    "default": [],
+                    "title": "The tls Schema",
+                    "items": {},
+                    "examples": [
+                        []
+                    ]
+                }
+            },
+            "examples": [{
+                "enabled": true,
+                "className": "",
+                "annotations": {},
+                "hosts": [{
+                    "host": "cs-data-management",
+                    "paths": [{
+                        "path": "/",
+                        "pathType": "ImplementationSpecific"
+                    }]
+                }],
+                "tls": []
+            }]
+        },
+        "resources": {
+            "type": "object",
+            "default": {},
+            "title": "The resources Schema",
+            "required": [
+                "requests"
+            ],
+            "properties": {
+                "requests": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The requests Schema",
+                    "required": [
+                        "cpu",
+                        "memory"
+                    ],
+                    "properties": {
+                        "cpu": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The cpu Schema",
+                            "examples": [
+                                "100m"
+                            ]
+                        },
+                        "memory": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The memory Schema",
+                            "examples": [
+                                "128M"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "cpu": "100m",
+                        "memory": "128M"
+                    }]
+                }
+            },
+            "examples": [{
+                "requests": {
+                    "cpu": "100m",
+                    "memory": "128M"
+                }
+            }]
+        },
+        "podAnnotations": {
+            "type": "object",
+            "default": {},
+            "title": "The podAnnotations Schema",
+            "required": [
+                "prometheus.io/scrape",
+                "prometheus.io/port",
+                "prometheus.io/path",
+                "sidecar.jaegertracing.io/inject"
+            ],
+            "properties": {
+                "prometheus.io/scrape": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The prometheus.io/scrape Schema",
+                    "examples": [
+                        "true"
+                    ]
+                },
+                "prometheus.io/port": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The prometheus.io/port Schema",
+                    "examples": [
+                        "9004"
+                    ]
+                },
+                "prometheus.io/path": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The prometheus.io/path Schema",
+                    "examples": [
+                        "/metrics"
+                    ]
+                },
+                "sidecar.jaegertracing.io/inject": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The sidecar.jaegertracing.io/inject Schema",
+                    "examples": [
+                        "true"
+                    ]
+                }
+            },
+            "examples": [{
+                "prometheus.io/scrape": "true",
+                "prometheus.io/port": "9004",
+                "prometheus.io/path": "/metrics",
+                "sidecar.jaegertracing.io/inject": "true"
+            }]
+        },
+        "nodeSelector": {
+            "type": "object",
+            "default": {},
+            "title": "The nodeSelector Schema",
+            "required": [],
+            "properties": {},
+            "examples": [{}]
+        },
+        "tolerations": {
+            "type": "array",
+            "default": [],
+            "title": "The tolerations Schema",
+            "items": {},
+            "examples": [
+                []
+            ]
+        },
+        "affinity": {
+            "type": "object",
+            "default": {},
+            "title": "The affinity Schema",
+            "required": [],
+            "properties": {},
+            "examples": [{}]
+        },
+        "kafka": {
+            "type": "object",
+            "default": {},
+            "title": "The kafka Schema",
+            "required": [
+                "enable",
+                "topicSuffix",
+                "producerConfig"
+            ],
+            "properties": {
+                "enable": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "The enable Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "topicSuffix": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The topicSuffix Schema",
+                    "examples": [
+                        ""
+                    ]
+                },
+                "producerConfig": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The producerConfig Schema",
+                    "required": [
+                        "clientId",
+                        "bootstrapServers",
+                        "securityProtocol",
+                        "enableSslCertificateVerification",
+                        "sslEndpointIdentificationAlgorithm",
+                        "acks"
+                    ],
+                    "properties": {
+                        "clientId": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The clientId Schema",
+                            "examples": [
+                                "CatalogServices"
+                            ]
+                        },
+                        "bootstrapServers": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The bootstrapServers Schema",
+                            "examples": [
+                                ""
+                            ]
+                        },
+                        "securityProtocol": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The securityProtocol Schema",
+                            "enum": ["Plaintext","Ssl","SaslPlaintext","SaslSsl"],
+                            "examples": [
+                                "Plaintext",
+                                "Ssl",
+                                "SaslPlaintext",
+                                "SaslSsl"
+                            ]
+                        },
+                        "enableSslCertificateVerification": {
+                            "type": "boolean",
+                            "default": false,
+                            "title": "The enableSslCertificateVerification Schema",
+                            "examples": [
+                                false
+                            ]
+                        },
+                        "sslEndpointIdentificationAlgorithm": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The sslEndpointIdentificationAlgorithm Schema",
+                            "enum": ["None","Http","Https"],
+                            "examples": [
+                                "None",
+                                "Http",
+                                "Https"
+                            ]
+                        },
+                        "acks": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The acks Schema",
+                            "enum": ["All","None","Leader"],
+                            "examples": [
+                                "All",
+                                "None",
+                                "Leader"
+                            ]
+                        },
+                        "saslMechanism": {
+                            "type": ["string","null"],
+                            "default": "",
+                            "title": "The saslMechanism Schema",
+                            "enum": [null,"","Plain","SCRAM-SHA-256","SCRAM-SHA-512"],
+                            "examples": [
+                                "",
+                                "Plain",
+                                "SCRAM-SHA-256",
+                                "SCRAM-SHA-512"
+                            ]
+                        },
+                        "saslUsername": {
+                            "type": ["string","null"],
+                            "default": "",
+                            "title": "The saslUsername Schema",
+                            "examples": [
+                                ""
+                            ]
+                        },
+                        "saslPassword": {
+                            "type": ["string","null"],
+                            "default": "",
+                            "title": "The saslPassword Schema",
+                            "examples": [
+                                ""
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "clientId": "CatalogServices",
+                        "bootstrapServers": "",
+                        "securityProtocol": "Plaintext",
+                        "enableSslCertificateVerification": false,
+                        "sslEndpointIdentificationAlgorithm": "None",
+                        "acks": "All",
+                        "saslMechanism": "",
+                        "saslUsername": "",
+                        "saslPassword": ""
+                    }]
+                }
+            },
+            "examples": [{
+                "enable": false,
+                "topicSuffix": "",
+                "producerConfig": {
+                    "clientId": "CatalogServices",
+                    "bootstrapServers": "",
+                    "securityProtocol": "Plaintext",
+                    "enableSslCertificateVerification": false,
+                    "sslEndpointIdentificationAlgorithm": "None",
+                    "acks": "All",
+                    "saslMechanism": "",
+                    "saslUsername": "",
+                    "saslPassword": ""
+                }
+            }]
+        },
+        "environment": {
+            "type": "object",
+            "default": {},
+            "title": "The environment Schema",
+            "required": [
+                "namespace",
+                "cayleyDeployment",
+                "builderDeployment",
+                "coreDeployment",
+                "Jaeger",
+                "logLevel",
+                "logToFile",
+                "logFileLocation",
+                "urls",
+                "volumePvcName",
+                "volumeName"
+            ],
+            "properties": {
+                "namespace": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The namespace Schema",
+                    "examples": [
+                        "default"
+                    ]
+                },
+                "cayleyDeployment": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The cayleyDeployment Schema",
+                    "required": [
+                        "path",
+                        "maxReplication",
+                        "alpha",
+                        "beta"
+                    ],
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The path Schema",
+                            "examples": [
+                                "/data/EmptyData/data.nq"
+                            ]
+                        },
+                        "maxReplication": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "The maxReplication Schema",
+                            "examples": [
+                                1
+                            ]
+                        },
+                        "alpha": {
+                            "type": "object",
+                            "default": {},
+                            "title": "The alpha Schema",
+                            "required": [
+                                "releaseName",
+                                "host",
+                                "port"
+                            ],
+                            "properties": {
+                                "releaseName": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "The releaseName Schema",
+                                    "examples": [
+                                        "cs-cayley-a"
+                                    ]
+                                },
+                                "host": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "The host Schema",
+                                    "examples": [
+                                        "cs-cayley-a"
+                                    ]
+                                },
+                                "port": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "The port Schema",
+                                    "examples": [
+                                        "64210"
+                                    ]
+                                }
+                            },
+                            "examples": [{
+                                "releaseName": "cs-cayley-a",
+                                "host": "cs-cayley-a",
+                                "port": "64210"
+                            }]
+                        },
+                        "beta": {
+                            "type": "object",
+                            "default": {},
+                            "title": "The beta Schema",
+                            "required": [
+                                "releaseName",
+                                "host",
+                                "port"
+                            ],
+                            "properties": {
+                                "releaseName": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "The releaseName Schema",
+                                    "examples": [
+                                        "cs-cayley-b"
+                                    ]
+                                },
+                                "host": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "The host Schema",
+                                    "examples": [
+                                        "cs-cayley-b"
+                                    ]
+                                },
+                                "port": {
+                                    "type": "string",
+                                    "default": "",
+                                    "title": "The port Schema",
+                                    "examples": [
+                                        "64210"
+                                    ]
+                                }
+                            },
+                            "examples": [{
+                                "releaseName": "cs-cayley-b",
+                                "host": "cs-cayley-b",
+                                "port": "64210"
+                            }]
+                        }
+                    },
+                    "examples": [{
+                        "path": "/data/EmptyData/data.nq",
+                        "maxReplication": 1,
+                        "alpha": {
+                            "releaseName": "cs-cayley-a",
+                            "host": "cs-cayley-a",
+                            "port": "64210"
+                        },
+                        "beta": {
+                            "releaseName": "cs-cayley-b",
+                            "host": "cs-cayley-b",
+                            "port": "64210"
+                        }
+                    }]
+                },
+                "builderDeployment": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The builderDeployment Schema",
+                    "required": [
+                        "releaseName",
+                        "host",
+                        "port"
+                    ],
+                    "properties": {
+                        "releaseName": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The releaseName Schema",
+                            "examples": [
+                                "cs-builder"
+                            ]
+                        },
+                        "host": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The host Schema",
+                            "examples": [
+                                "cs-builder"
+                            ]
+                        },
+                        "port": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The port Schema",
+                            "examples": [
+                                "9002"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "releaseName": "cs-builder",
+                        "host": "cs-builder",
+                        "port": "9002"
+                    }]
+                },
+                "coreDeployment": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The coreDeployment Schema",
+                    "required": [
+                        "releaseName"
+                    ],
+                    "properties": {
+                        "releaseName": {
+                            "type": "string",
+                            "default": "",
+                            "title": "The releaseName Schema",
+                            "examples": [
+                                "cs-core"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "releaseName": "cs-core"
+                    }]
+                },
+                "Jaeger": {
+                    "type": "object",
+                    "default": {},
+                    "title": "The Jaeger Schema",
+                    "required": [
+                        "AgentPort"
+                    ],
+                    "properties": {
+                        "AgentPort": {
+                            "type": "integer",
+                            "default": 0,
+                            "title": "The AgentPort Schema",
+                            "examples": [
+                                6831
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "AgentPort": 6831
+                    }]
+                },
+                "logLevel": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The logLevel Schema",
+                    "examples": [
+                        "Information"
+                    ]
+                },
+                "logToFile": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "The logToFile Schema",
+                    "examples": [
+                        false
+                    ]
+                },
+                "logFileLocation": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The logFileLocation Schema",
+                    "examples": [
+                        "/data/Logs/cs-data-management"
+                    ]
+                },
+                "urls": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The urls Schema",
+                    "examples": [
+                        "http://*:9004"
+                    ]
+                },
+                "volumePvcName": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The volumePvcName Schema",
+                    "examples": [
+                        "cs-storage-pvc"
+                    ]
+                },
+                "volumeName": {
+                    "type": "string",
+                    "default": "",
+                    "title": "The volumeName Schema",
+                    "examples": [
+                        "pvol"
+                    ]
+                }
+            },
+            "examples": [{
+                "namespace": "default",
+                "cayleyDeployment": {
+                    "path": "/data/EmptyData/data.nq",
+                    "maxReplication": 1,
+                    "alpha": {
+                        "releaseName": "cs-cayley-a",
+                        "host": "cs-cayley-a",
+                        "port": "64210"
+                    },
+                    "beta": {
+                        "releaseName": "cs-cayley-b",
+                        "host": "cs-cayley-b",
+                        "port": "64210"
+                    }
+                },
+                "builderDeployment": {
+                    "releaseName": "cs-builder",
+                    "host": "cs-builder",
+                    "port": "9002"
+                },
+                "coreDeployment": {
+                    "releaseName": "cs-core"
+                },
+                "Jaeger": {
+                    "AgentPort": 6831
+                },
+                "logLevel": "Information",
+                "logToFile": false,
+                "logFileLocation": "/data/Logs/cs-data-management",
+                "urls": "http://*:9004",
+                "volumePvcName": "cs-storage-pvc",
+                "volumeName": "pvol"
+            }]
+        }
+    },
+    "examples": [{
+        "replicaCount": 1,
+        "image": {
+            "repository": "cs-data-management",
+            "pullPolicy": "IfNotPresent",
+            "tag": "latest"
+        },
+        "imagePullSecrets": [],
+        "nameOverride": "",
+        "fullnameOverride": "",
+        "serviceAccount": {
+            "create": false,
+            "annotations": {},
+            "name": "dms-sa"
+        },
+        "podSecurityContext": {
+            "runAsUser": 1000,
+            "runAsGroup": 3000,
+            "fsGroup": 2000
+        },
+        "securityContext": {},
+        "service": {
+            "type": "ClusterIP",
+            "port": 9004
+        },
+        "deployment": {
+            "containerPort": 9004
+        },
+        "ingress": {
+            "enabled": true,
+            "className": "",
+            "annotations": {},
+            "hosts": [{
+                "host": "cs-data-management",
+                "paths": [{
+                    "path": "/",
+                    "pathType": "ImplementationSpecific"
+                }]
+            }],
+            "tls": []
+        },
+        "resources": {
+            "requests": {
+                "cpu": "100m",
+                "memory": "128M"
+            }
+        },
+        "podAnnotations": {
+            "prometheus.io/scrape": "true",
+            "prometheus.io/port": "9004",
+            "prometheus.io/path": "/metrics",
+            "sidecar.jaegertracing.io/inject": "true"
+        },
+        "nodeSelector": {},
+        "tolerations": [],
+        "affinity": {},
+        "kafka": {
+            "enable": false,
+            "topicSuffix": "",
+            "producerConfig": {
+                "clientId": "CatalogServices",
+                "bootstrapServers": "",
+                "securityProtocol": "Plaintext",
+                "enableSslCertificateVerification": false,
+                "sslEndpointIdentificationAlgorithm": "None",
+                "acks": "All",
+                "saslMechanism": "",
+                "saslUsername": "",
+                "saslPassword": ""
+            }
+        },
+        "environment": {
+            "namespace": "default",
+            "cayleyDeployment": {
+                "path": "/data/EmptyData/data.nq",
+                "maxReplication": 1,
+                "alpha": {
+                    "releaseName": "cs-cayley-a",
+                    "host": "cs-cayley-a",
+                    "port": "64210"
+                },
+                "beta": {
+                    "releaseName": "cs-cayley-b",
+                    "host": "cs-cayley-b",
+                    "port": "64210"
+                }
+            },
+            "builderDeployment": {
+                "releaseName": "cs-builder",
+                "host": "cs-builder",
+                "port": "9002"
+            },
+            "coreDeployment": {
+                "releaseName": "cs-core"
+            },
+            "Jaeger": {
+                "AgentPort": 6831
+            },
+            "logLevel": "Information",
+            "logToFile": false,
+            "logFileLocation": "/data/Logs/cs-data-management",
+            "urls": "http://*:9004",
+            "volumePvcName": "cs-storage-pvc",
+            "volumeName": "pvol"
+        }
+    }]
+}

@@ -1,0 +1,84 @@
+replicaCount: 1
+image:
+  repository: 774303220817.dkr.ecr.eu-west-1.amazonaws.com/catalog-services/cs-data-management
+  pullPolicy: IfNotPresent
+  tag: 5.1.0
+imagePullSecrets: []
+nameOverride: ''
+fullnameOverride: ''
+serviceAccount:
+  create: false
+  annotations: {}
+  name: dms-sa
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+securityContext: {}
+service:
+  type: ClusterIP
+  port: 9004
+deployment:
+  containerPort: 9004
+ingress:
+  enabled: true
+  className: ''
+  annotations: {}
+  hosts:
+  - host: cs-data-management
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls: []
+resources:
+  requests:
+    cpu: 100m
+    memory: 128M
+podAnnotations:
+  prometheus.io/scrape: 'true'
+  prometheus.io/port: '9004'
+  prometheus.io/path: /metrics
+  sidecar.jaegertracing.io/inject: 'true'
+nodeSelector: {}
+tolerations: []
+affinity: {}
+kafka:
+  enable: false
+  topicSuffix: ''
+  producerConfig:
+    clientId: CatalogServices
+    bootstrapServers: ''
+    securityProtocol: Plaintext
+    enableSslCertificateVerification: false
+    sslEndpointIdentificationAlgorithm: None
+    acks: All
+    saslMechanism: null
+    saslUsername: null
+    saslPassword: null
+environment:
+  namespace: default
+  cayleyDeployment:
+    path: /data/EmptyData/data.nq
+    maxReplication: 1
+    alpha:
+      releaseName: cs-cayley-a
+      host: cs-cayley-a
+      port: '64210'
+    beta:
+      releaseName: cs-cayley-b
+      host: cs-cayley-b
+      port: '64210'
+  builderDeployment:
+    releaseName: cs-builder
+    host: cs-builder
+    port: '9002'
+  coreDeployment:
+    releaseName: cs-core
+  Jaeger:
+    AgentPort: 6831
+  logLevel: Information
+  logToFile: false
+  logFileLocation: /data/Logs/cs-data-management
+  urls: http://*:9004
+  volumePvcName: cs-storage-pvc
+  volumeName: pvol

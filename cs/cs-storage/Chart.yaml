@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 5.1.0
+description: A storage solution for CS products - including a PVC and StorageClass
+name: cs-storage
+type: application
+version: 5.1.0

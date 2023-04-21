@@ -1,0 +1,13 @@
+{{- if eq $.Values.protocol "SASL_SSL" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: confluent-properties
+data:
+  confluent.properties: |-
+    bootstrap.servers={{ .Values.zookeeperConnectionString }}
+    security.protocol={{ .Values.protocol | upper }}
+    sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username='{{ .Values.saslUsername }}' password='{{ .Values.saslPassword }}';
+    sasl.mechanism={{ .Values.saslMechanism }}
+    client.dns.lookup={{ .Values.dnsLookup }}
+{{- end }}

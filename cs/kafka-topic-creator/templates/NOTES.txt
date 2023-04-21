@@ -1,0 +1,4 @@
+The {{ template "kafka-topic-creator.fullname" . }} job installed successfully.
+Run the following command to see the progress.
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app={{ template "kafka-topic-creator.name" . }},release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl logs -f $POD_NAME -n {{ .Release.Namespace }}

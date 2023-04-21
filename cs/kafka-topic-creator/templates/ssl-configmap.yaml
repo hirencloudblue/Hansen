@@ -1,0 +1,9 @@
+{{- if eq $.Values.protocol "SSL" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client-properties
+data:
+  client.properties: |-
+    security.protocol=SSL
+{{- end }}
