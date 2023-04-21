@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cs-core.fullname" . }}
+  labels:
+    {{- include "cs-core.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "cs-core.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "cs-core.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cs-core.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: OTEL_EXPORTER_JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_EXPORTER_JAEGER_AGENT_PORT
+              value: "{{ .Values.environment.Jaeger.AgentPort }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.deployment.containerPort }}
+              protocol: TCP
+          volumeMounts:
+            - mountPath: "/data"
+              name: {{ .Values.environment.volumeName }}
+            - mountPath: "/app/appsettings.json"
+              name: appsettings
+              subPath: appsettings.json
+            {{- $licenseSecret :=  (lookup "v1" "Secret" .Release.Namespace "cs-license-secret") }}
+            {{- $licenseFile := .Files.Glob  "**.csdlic"}}
+            {{ if or ($licenseSecret) ($licenseFile) }}
+            - mountPath: {{ .Values.environment.licencePath | default "/app/cs-license.csdlic" }}
+              name: cs-license-secret
+              subPath: cs-license.csdlic
+            {{end}}
+            - mountPath: /tmp
+              name: tmp-vol
+          livenessProbe:
+            httpGet:
+              path: /api/status
+              port: http
+            failureThreshold: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: {{ .Values.environment.volumeName }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.environment.volumePvcName }}
+      - name: appsettings
+        configMap:
+          name: appsettings-configmap-{{ .Release.Name }}
+      - name: cs-license-secret
+        secret:
+          secretName: {{ .Values.secrets.csLicenseSecret }}
+          optional: true
+      - emptyDir:
+          medium: Memory
+        name: tmp-vol
