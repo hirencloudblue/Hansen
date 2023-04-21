@@ -3,7 +3,8 @@ image:
   repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-core
   pullPolicy: Always
   tag: 5.1.39-GA
-imagePullSecrets: []
+imagePullSecrets: 
+ -name: ecr-secret
 nameOverride: ''
 fullnameOverride: cs-core
 serviceAccount:
