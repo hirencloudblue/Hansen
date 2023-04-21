@@ -46,7 +46,7 @@ persistentVolumes:
       - create: false # Determines if to use pv locally
         name: cs-dev-pv # Name of pv
         storageClassName: manual
-        storage: 10Gi
+        storage: 5Gi
         accessMode: ReadWriteMany
         path: "/run/desktop/mnt/host/c/data" # Path to the local folder specific to local kubernetes running on docker.
     efs: # This is for efs storage needs to be set to true when deploying on aws
@@ -57,4 +57,4 @@ persistentVolumes:
         storage: 10Gi
         accessMode: ReadWriteMany
         provisioner: efs.csi.aws.com # This is provisioner specific to aws
-        fileSystemId: fs-0e47271f058efcbcd # This is a unique id of efs instance on aws, this will be customer specific
+        fileSystemId: fs-098fd096f2fcc4111 # This is a unique id of efs instance on aws, this will be customer specific
