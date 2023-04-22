@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-builder
   pullPolicy: IfNotPresent
-  tag: 5.1.0
+  tag: 5.1.27-GA
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
@@ -21,11 +21,11 @@ service:
   enableNodePort: false
 ingress:
   enabled: true
-  className: ''
-  annotations: {}
-  hosts:
-  - host: cs-builder
-    paths:
+  className: alb
+  annotations:
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: instance
+  paths:
     - path: /
       pathType: ImplementationSpecific
   tls: []
