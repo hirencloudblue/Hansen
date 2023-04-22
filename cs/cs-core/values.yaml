@@ -33,7 +33,7 @@ ingress:
   #enabled: true
   #hosts:
   #- host: cs-core-csd-dev-cluster.internal.delivery.hansencx.com
-   spec:
+  spec:
   ingressClassName: alb
   rules:
     - http:
