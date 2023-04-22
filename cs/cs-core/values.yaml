@@ -1,10 +1,9 @@
 replicaCount: 1
 image:
-  repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-core
+  repository: 774303220817.dkr.ecr.eu-west-1.amazonaws.com/catalog-services/cs-core
   pullPolicy: Always
-  tag: 5.1.39-GA
-imagePullSecrets: 
- -name: ecr-secret
+  tag: 5.1.0
+imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: cs-core
 serviceAccount:
@@ -23,39 +22,26 @@ deployment:
   containerPort: 9003
 ingress:
   annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: instance
-    alb.ingress.kubernetes.io/tags: Environment=staging    
-    #kubernetes.io/ingress.class: nginx
-    #nginx.ingress.kubernetes.io/auth-tls-verify-client: "off"
-    #nginx.ingress.kubernetes.io/auth-tls-secret: "cs/cs-api-gateway-secret"
-  #className: ''
-  #enabled: true
-  #hosts:
-  #- host: cs-core-csd-dev-cluster.internal.delivery.hansencx.com
-  spec:
-  ingressClassName: alb
-  rules:
-    - http:
-        paths:
-          - path: /
-            pathType: ImplementationSpecific 
-    #paths:
-    #- path: /
-      #pathType: ImplementationSpecific
-  #tls:
-  #- secretName: nginx-ingress-secret
-  #  hosts:
-  #   - cs-core-csd-dev-cluster.internal.delivery.hansencx.com
+    kubernetes.io/ingress.class: nginx
+  className: ''
+  enabled: true
+  hosts:
+  - host: cs-core
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+  - secretName: none
+    hosts:
+    - none
 resources:
   limits:
-    cpu: 2000m
-    memory: 512M
+    cpu: 1000m
   requests:
-    cpu: 300m
+    cpu: 500m
     memory: 512M
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
@@ -79,17 +65,20 @@ config:
     RequiresHttpsMetadata: false
     ScopeClaimKey: scope
   EventHandler:
-    IsEnabled: true
+    IsEnabled: false
+    File:
+      Name: Default
+      FilePath: /data/TestNotifyFile.txt
     Http:
       Name: Default
-      Uri: https://cpq-server-csd-dev-cluster.internal.delivery.hansencx.com/api/internal/catalogServicesDataRefreshed
+      Uri: http://localhost:9003/api/test/echo
   Formatting:
     DefaultResponseFormat: application/xml
   Caching:
     PersistedCache:
       Location: /data/
-    ResponseCacheEnable: false
-    InternalCacheEnable: false
+    ResponseCacheEnable: true
+    InternalCacheEnable: true
     DistributedCache:
       Enable: false
       SlidingExpirationInHours: 1
