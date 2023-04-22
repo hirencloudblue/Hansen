@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: 774303220817.dkr.ecr.eu-west-1.amazonaws.com/catalog-services/cs-data-management
+  repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-data-management
   pullPolicy: IfNotPresent
   tag: 5.1.0
 imagePullSecrets: []
