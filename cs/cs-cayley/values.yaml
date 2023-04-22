@@ -23,9 +23,11 @@ service:
 deployment:
   containerPort: 64210
 ingress:
-  enabled: false
-  className: ''
-  annotations: {}
+  enabled: true
+  className: alb
+  annotations:
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: instance
   hosts:
   - host: cs-cayley
     paths:
