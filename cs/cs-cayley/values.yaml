@@ -23,7 +23,7 @@ service:
 deployment:
   containerPort: 64210
 ingress:
-  enabled: true
+  enabled: false
   className: ''
   annotations: {}
   hosts:
