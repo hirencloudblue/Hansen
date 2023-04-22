@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-data-management
   pullPolicy: IfNotPresent
-  tag: 5.1.0
+  tag: 5.1.24-GA
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
