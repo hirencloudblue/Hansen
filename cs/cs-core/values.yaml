@@ -17,16 +17,16 @@ podSecurityContext:
 securityContext: {}
 service:
   port: 9003
-  type: ClusterIP
+  type: NodePort
 deployment:
   containerPort: 9003
 ingress:
   annotations:
-    kubernetes.io/ingress.class: nginx
-  className: ''
+    kubernetes.io/ingress.class: alb 
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: instance
   enabled: true
   hosts:
-  - host: cs-core
     paths:
     - path: /
       pathType: ImplementationSpecific
