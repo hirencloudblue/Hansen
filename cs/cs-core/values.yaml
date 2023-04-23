@@ -22,9 +22,9 @@ deployment:
   containerPort: 9003
 ingress:
   annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: instance
+     kubernetes.io/ingress.class: alb
+     alb.ingress.kubernetes.io/scheme: internet-facing
+     alb.ingress.kubernetes.io/target-type: instance
   enabled: true
   hosts:
     paths:
