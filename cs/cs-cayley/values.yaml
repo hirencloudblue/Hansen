@@ -1,8 +1,8 @@
 replicaCount: 1
 image:
-  repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-cayley
-  tag: 5.1.22-GA
-  pullPolicy: IfNotPresent
+ repository: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cs/cs-cayley
+ tag: 5.1.22-GA
+ pullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ''
 fullnameOverride: ''
