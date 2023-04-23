@@ -4,12 +4,12 @@ image:
   pullPolicy: Always
   tag: 5.1.39-GA
 imagePullSecrets: []
-nameOverride: ""
+nameOverride: ''
 fullnameOverride: cs-core
 serviceAccount:
   annotations: {}
   create: false
-  name: ""
+  name: ''
 podSecurityContext:
   fsGroup: 2000
   runAsGroup: 3000
@@ -17,23 +17,23 @@ podSecurityContext:
 securityContext: {}
 service:
   port: 9003
-  type: NodePort
+  type: ClusterIP
 deployment:
   containerPort: 9003
 ingress:
   annotations:
-     kubernetes.io/ingress.class: alb
-     alb.ingress.kubernetes.io/scheme: internet-facing
-     alb.ingress.kubernetes.io/target-type: instance
+    kubernetes.io/ingress.class: nginx
+  className: ''
   enabled: true
   hosts:
+  - host: cs-core
     paths:
-      - path: /
-        pathType: ImplementationSpecific
+    - path: /
+      pathType: ImplementationSpecific
   tls:
-    - secretName: none
-      hosts:
-        - none
+  - secretName: none
+    hosts:
+    - none
 resources:
   limits:
     cpu: 1000m
@@ -49,9 +49,9 @@ autoscaling:
   scaleUpStabilizationPeriod: 120
 podAnnotations:
   prometheus.io/path: /metrics
-  prometheus.io/port: "9003"
-  prometheus.io/scrape: "true"
-  sidecar.jaegertracing.io/inject: "true"
+  prometheus.io/port: '9003'
+  prometheus.io/scrape: 'true'
+  sidecar.jaegertracing.io/inject: 'true'
 nodeSelector: {}
 tolerations: []
 affinity: {}
@@ -126,12 +126,12 @@ secrets:
 environment:
   dataManagementConfig:
     host: cs-data-management
-    port: "9004"
+    port: '9004'
   Jaeger:
     AgentPort: 6831
   data:
     host: cs-cayley-a
-    port: "64210"
+    port: '64210'
     path: /data/EmptyData/data.nq
   logLevel: Information
   logToFile: false
