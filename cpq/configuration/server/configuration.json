@@ -1,7 +1,7 @@
 {
     "sigma-cpq-services-server": {
         "catalogServicesConnection": {
-            "hostName": "cs-core-csd-dev-cluster.internal.delivery.hansencx.com",
+            "hostName": "http://aa7d2b114ed6043d0b0a6826ca11ff72-1919970540.us-east-1.elb.amazonaws.com:9003/,
             "port": 443,
             "basePath": "",
             "isSecure": true,
@@ -51,12 +51,12 @@
         "sharedDataAccess": {
             "exactConnectionString": "",
             "protocol": "mongodb+srv",
-            "server": "cluster1.jbytn.mongodb.net",
+            "server": "poc.b1jtsn8.mongodb.net",
             "port": "27017",
             "writeConcern": 1,
             "writeConcernTimeout": 5000,
             "journal": false,
-            "connectionPool": {
+            "connectionPool": {1
                 "maxPoolSize": 50,
                 "minPoolSize": 0
             },
@@ -90,8 +90,9 @@
                 "mongoSharding": {
                     "enabled": false,
                     "shardingHostAndPort": [
-                        "sharding-1.domain.com:47017",
-                        "sharding-2.domain.com:47018"
+                        "ac-mqigxz8-shard-00-00.b1jtsn8.mongodb.net:27017",
+                        "ac-mqigxz8-shard-00-01.b1jtsn8.mongodb.net:27017"
+			"ac-mqigxz8-shard-00-02.b1jtsn8.mongodb.net:27017"
                     ]
                 }
             }
