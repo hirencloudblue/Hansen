@@ -1,7 +1,7 @@
 {
     "sigma-cpq-services-server": {
         "catalogServicesConnection": {
-            "hostName": "http://aa7d2b114ed6043d0b0a6826ca11ff72-1919970540.us-east-1.elb.amazonaws.com:9003/,
+            "hostName": "aa7d2b114ed6043d0b0a6826ca11ff72-1919970540.us-east-1.elb.amazonaws.com:9003/,
             "port": 443,
             "basePath": "",
             "isSecure": true,
