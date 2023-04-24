@@ -1,0 +1,117 @@
+{{- if .Values.server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.server.deployment.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/component: Server
+    app.kubernetes.io/part-of: CPQ
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/server/server.configmap.yaml") . | sha256sum }}
+spec:
+  {{- if not .Values.server.autoscaling.enabled }}
+  replicas: {{ .Values.server.deployment.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.name: {{ .Values.server.deployment.label }}
+  template:
+    metadata:
+      {{- with .Values.server.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.name: {{ .Values.server.deployment.label }}
+    spec:
+      {{- with .Values.server.deployment.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        {{- toYaml .Values.server.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- range $initContainer := .Values.server.initContainers }}
+        - name: {{ $initContainer.name }}
+          image: "{{ $initContainer.image.repo}}:{{ $initContainer.image.tag }}"
+          volumeMounts:
+          - mountPath: "{{ $initContainer.volumeMount.path }}"
+            name: {{ $initContainer.volumeMount.name }}
+        {{- end }}
+      containers:
+      - image: "{{ .Values.server.deployment.image.repo }}:{{ .Values.server.deployment.image.tag }}"
+        imagePullPolicy: {{ .Values.server.deployment.image.pullPolicy }}
+        name: {{ .Values.server.deployment.label }}
+        securityContext:
+          {{- toYaml .Values.server.securityContext | nindent 12 }}
+        env:
+          {{- toYaml .Values.server.environmentVariables | nindent 10 }}
+        ports:
+        - containerPort: {{ .Values.server.deployment.containerPort }}
+        startupProbe:
+          httpGet:
+            path: /api/status
+            port: 9001
+          # Maximum of 5mins (30 * 10 = 300secs) to finish the start up
+          failureThreshold: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: 9001
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/status
+            port: 9001
+          failureThreshold: 3
+          periodSeconds: 30
+        resources:
+          {{- toYaml .Values.server.resources | nindent 12 }}
+        volumeMounts:
+          {{- if .Values.server.cryptography.enabled }}
+          - name: cpq-server-crypto-volume
+            mountPath: "{{ .Values.server.cryptography.path }}{{ .Values.server.cryptography.fileName }}"
+            subPath: "{{ .Values.server.cryptography.fileName }}"
+            readOnly: true
+          {{- end }}
+          - name: cpq-server-config-volume
+            mountPath: "/app/configuration.json"
+            subPath: "configuration.json"
+            readOnly: true
+          - name: cpq-server-header-config-volume
+            mountPath: "/app/headerConfiguration.json"
+            subPath: "headerConfiguration.json"
+            readOnly: true
+          - name: cpq-server-log-volume
+            mountPath: "/logs/"
+            readOnly: false
+          {{- range $initContainer := .Values.server.initContainers }}
+          - name: {{ $initContainer.volumeMount.name }}
+            mountPath: "/app/plugins/{{ $initContainer.name }}"
+            readOnly: {{ $initContainer.volumeMount.readOnly }}
+          {{- end }}
+      volumes:
+        {{- if .Values.server.cryptography.enabled }}
+        - name: cpq-server-crypto-volume
+          secret:
+            secretName: {{ .Values.server.cryptography.secretName }}
+        {{- end }}
+        - name: cpq-server-config-volume
+          configMap:
+            name: cpq-server-config
+        - name: cpq-server-header-config-volume
+          configMap:
+            name: cpq-server-header-config
+        - name: cpq-server-log-volume
+        {{- range $initContainer := .Values.server.initContainers }}
+        - name: {{ $initContainer.volumeMount.name }}
+          emptyDir: {}
+        {{- end }}
+{{- end }}

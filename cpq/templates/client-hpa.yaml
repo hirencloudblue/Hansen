@@ -1,0 +1,42 @@
+{{- if .Values.client.autoscaling.enabled }}
+{{- if semverCompare ">=1.23-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: autoscaling/v2
+{{- else -}}
+apiVersion: autoscaling/v2beta1
+{{- end }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.client.autoscaling.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/component: Autoscaling
+    app.kubernetes.io/part-of: CPQ
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.client.deployment.name }}
+  minReplicas: {{ .Values.client.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.client.autoscaling.maxReplicas }}
+  metrics:
+    {{- toYaml .Values.client.autoscaling.metrics | nindent 4 }}
+  {{- if semverCompare ">=1.23-0" .Capabilities.KubeVersion.GitVersion }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.client.autoscaling.behavior.scaleDown.stabilizationWindowSeconds }}
+      {{- if gt (len .Values.client.autoscaling.behavior.scaleDown.policies) 0 }}
+      policies:
+        {{- toYaml .Values.client.autoscaling.behavior.scaleDown.policies | nindent 8 }}
+      {{- end }}
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.client.autoscaling.behavior.scaleUp.stabilizationWindowSeconds }}
+      {{- if gt (len .Values.client.autoscaling.behavior.scaleUp.policies) 0 }}
+      policies:
+        {{- toYaml .Values.client.autoscaling.behavior.scaleUp.policies | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end }}

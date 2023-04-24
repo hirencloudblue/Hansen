@@ -1,0 +1,960 @@
+# @section CPQ client parameters
+#
+# @param client.enabled - Flag indicating whether or not to deploy CPQ client
+# @param client.deployment - Deployment parameters
+# @param client.podSecurityContext - Pod security context
+# @param client.securityContext - Container security context
+# @param client.service - Service parameters
+# @param client.ingress - Ingress parameters
+# @param client.resources - CPQ client resources
+# @param client.autoscaling - Autoscaling parameters
+# @param client.configuration - CPQ client configuration
+client:
+  enabled: true
+
+  # @section Deployment parameters
+  #
+  # @param client.deployment.replicaCount - Number of pods to deploy
+  # @param client.deployment.name - Deployment metadata name
+  # @param client.deployment.label - Deployment label
+  # @param client.deployment.image - Image parameters
+  # @param client.deployment.containerPort - Port where CPQ client will be running
+  deployment:
+    # @param replicaCount - Number of pods to deploy
+    #
+    # If autoscaling is enabled then the client.autoscaling.minReplicas parameter value will be used instead
+    replicaCount: 1
+    name: cpq-client-deployment
+    label: cpq-client
+
+    # @section Image parameters
+    #
+    # @param client.deployment.image.pullPolicy - Image pull policy
+    # @param client.deployment.image.imagePullSecrets - Image pull secrets
+    # @param client.deployment.image.repo - Image repository
+    # @param client.deployment.image.tag - Image tag
+    image:
+      pullPolicy: IfNotPresent
+
+      # @param imagePullSecrets
+      # Optionally specify an array of image pull secrets. However, secrets must be manually created before deployment
+      #
+      # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+      #
+      # Example:
+      # imagePullSecrets:
+      #   - myRegistryKeySecretName
+      imagePullSecrets: []
+
+      # @param repo - Image repository
+      #
+      # The repo parameter is required and needs to be valid otherwise, the deployment will fail
+      repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/cpq-client
+
+      # @param tag - Image tag
+      #
+      # The tag parameter is required with a valid value otherwise, the deployment will fail
+      tag: 4.3.2
+
+    containerPort: 9002
+
+  # @param podSecurityContext - Pod security context
+  #
+  # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  podSecurityContext:
+    runAsUser: 1001 # default user
+    runAsGroup: 0 # root user
+
+  # @param securityContext - Container security context
+  #
+  # If you want to specify the container, remove the curly braces after 'securityContext:', add the security parameters you wish to use and adjust the
+  # the values as necessary
+  #
+  # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  securityContext: {}
+
+  # @section service - Service parameters
+  #
+  # @param client.service.name - Service metadata name
+  # @param client.service.type - Publishing service types
+  # @param client.service.port - Exposed port
+  # @param client.service.targetPort: - Target container port
+  service:
+    name: cpq-client-service
+
+    # @param type - Publishing service types
+    #
+    # There are different types of services that you can use but we recommend that you use ClusterIP
+    #
+    # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+    type: ClusterIP
+    port: 9002
+    targetPort: 9002
+
+  # @section ingress - Ingress parameters
+  #
+  # @param client.ingress.enabled - Flag whether or not to deploy ingress for CPQ client
+  # @param client.ingress.name - Name of the ingress deployment
+  # @param client.ingress.hostName - CPQ client domain name
+  # @param client.ingress.path - CPQ client domain path
+  # @param client.ingress.pathType - Ingress path type
+  # @param client.ingress.annotations - Ingress annotations
+  # @param client.ingress.tls - Ingress TLS parameters
+  ingress:
+    enabled: true
+    name: cpq-client-ingress
+    hostName: "cpq-client-csd-dev-cluster.internal.delivery.hansencx.com"
+    path: /
+
+    # @param pathType - Ingress path type
+    #
+    # The path in an ingress is required to have a corresponding path type. Paths, which do not include an explicit path will fail validation
+    #
+    # Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types
+    pathType: Prefix
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/server-snippet: |
+        more_set_input_headers "authorization: Bearer $http_x_amzn_oidc_accesstoken";
+        more_set_input_headers "aws_id_token:$http_x_amzn_oidc_data";
+
+    # @section tls - Ingress TLS parameter
+    #
+    # @param client.ingress.tls.enabled - Flag indicating whether or not to use tls in the ingress
+    # @param client.ingress.tls.secretName Name of the secret that has the TLS certificate
+    tls:
+      enabled: false
+      secretName: ""
+
+  # @param resources - CPQ client resources
+  #
+  # We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts
+  # run on environments with little resources, such as Minikube. If you want to specify resources, remove the curly braces after 'limits:' and 'requests:'
+  # Then set the limits and requests based on the examples
+  #
+  # @param client.resources.limits - The resource limits
+  # @param client.sources.requests - The requested resource
+  resources:
+    limits:
+      cpu: 250m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  # @section autoscaling - Autoscaling parameters
+  #
+  # @param client.autoscaling.enabled - Flag indicating whether or not to deploy the HPA for CPQ client
+  # @param client.autoscaling.name - Name of the autoscaling deployment
+  # @param client.autoscaling.minReplicas - Minimum number of replicas
+  # @param client.autoscaling.maxReplicas - Maximum number of replicas
+  # @param client.autoscaling.metrics - Metrics for the CPQ client HPA
+  # @param.client.autoscaling.behavior - Behavior for the CPQ client HPA
+  autoscaling:
+    enabled: false
+    name: cpq-client-autoscaling
+    minReplicas: 1
+    maxReplicas: 4
+
+    # @param metrics - Metrics for the CPQ client HPA
+    #
+    # If you wish to specify the metrics when autoscaling is enabled, remove the square brackets after 'metrics:' and specify an array of metrics
+    #
+    # Default metrics have been set using the structure that is expected if you are using 'autoscaling/v2' as the 'apiVersion'
+    #
+    # If you are using 'autoscaling/v2beta1' as the 'apiVersion', please see the below example on how to structure the array of metrics:
+    #
+    # metrics:
+    #   - type: Resource
+    #     resource:
+    #      name: cpu
+    #      targetAverageUtilization: 80
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+    # @param behavior - Behavior for the CPQ client HPA
+    #
+    # Scaling on behavior is only supported on Kubernetes v1.23 [stable]. If you are on a lower version then the behavior property will not be applied
+    # to the CPQ client HPA.
+    #
+    # @param client.autoscaling.behavior.scaleDown - HPA scale down behavior
+    # @param client.autoscaling.behavior.scaleUp - HPA scale up behavior
+    behavior:
+      # @section scaleDown - HPA scale down behavior
+      #
+      # @param client.autoscaling.behavior.scaleDown.stabilizationWindowSeconds - Stabilization window in seconds
+      # @param client.autoscaling.behavior.scaleDown.policies - Scaling down behavior policies
+      scaleDown:
+        stabilizationWindowSeconds: 300
+
+        # @param policies - Scaling down behavior policies
+        #
+        # If you wish to specify the policies when autoscaling is enabled, remove the square brackets after 'policies' and specify an array of policies
+        #
+        # Example with default values:
+        # policies:
+        #   - type: Percent
+        #     value: 100
+        #     periodSeconds: 15
+        policies: []
+
+      # @section scaleUp - HPA scale up behavior
+      #
+      # @param client.autoscaling.behavior.scaleUp.stabilizationWindowSeconds - Stabilization window in seconds
+      # @param client.autoscaling.behavior.scaleUp.policies - Scaling up behavior policies
+      scaleUp:
+        stabilizationWindowSeconds: 0
+
+        # @param policies - Scaling up behavior policies
+        #
+        # If you wish to specify the policies when autoscaling is enabled, removed the square brackets after 'policies' and specify an array of policies
+        #
+        # Example with default values:
+        # policies:
+        #   - type: Percent
+        #     value: 100
+        #     periodSeconds: 15
+        #   - type: Pods
+        #     value: 4
+        #     periodSeconds: 15
+        policies: []
+
+  # @section configuration - CPQ client configuration
+  #
+  # @param client.configuration.file - CPQ client configuration via JSON configuration files
+  # @param client.configuration.contents - CPQ client configuration contents in YAML format
+  configuration:
+    # @param file - CPQ client configuration using a JSON configuration file
+    #
+    # Deprecated: We do not recommend using the JSON configuration files to configure CPQ client. We recommend setting the
+    # configuration under client.configuration.contents in an overriding values.yaml file.
+    #
+    # We will be removing the configuration JSON files in the next 4.x release
+    #
+    # @param client.configuration.file.enabled - Flag indicating whether or not CPQ client will be configured using the JSON configuration files
+    # @param client.configuration.file.path - Path to the JSON configuration files in the Helm charts
+    file:
+      enabled: false
+      path: "configuration/client/systemConfiguration.json"
+    contents:
+      configuration:
+        system:
+          realTimeRules: true                             
+          connections:
+            - name: CpqServices
+              hostName: cpq-client-csd-dev-cluster.internal.delivery.hansencx.com
+              port: 443
+              basePath: "/api"
+              isSecure: true
+              timeout: 100000
+              retryNumber: 3
+          defaultDataPackets:
+            - name: browse
+              data:
+                 rootClassificationId: Selling_Category_Value
+                 entityTypeId: offer
+                 displaySetId: short
+                 productTypes: "package,promotion,bundle"
+                 entityElementName: Sales_Category
+                 xsltCode: offer_short
+                 defaultClassificationGUID: 434100ae-a929-4ae3-b663-a4dd7fc77d27
+          security:
+            clientSettings:
+              allowLandingPage: true
+              displayNameClaim: name
+              isEmbeddedClient: false
+              showLogoutButton: false
+            enableSecurity: true
+            useExternalAuthentication: true
+            openIdSettings:
+              accessTokenExpiringNotificationTime: 60
+              authority: "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_n83FNjkyq"
+              baseUrl: "https://cpq-client-csd-dev-cluster.internal.delivery.hansencx.com"
+              client_id: "24fp7toja2rmh3qttbbl6qnhrp"
+              enableLogging: false
+              filterProtocolClaims: false
+              loadUserInfo: true
+              includeIdTokenInSilentRenew: false
+              monitorSession: true
+              post_logout_redirect_uri: "/logout"
+              redirect_uri: "/callback"
+              response_type: token
+              scope: openid profile email
+              silentRequestTimeout: 10000
+              silent_redirect_uri: "/silentRenew"
+
+# @section CPQ server parameters
+#
+# @param server.enabled - Flag indicating whether or not to deploy CPQ server
+# @param server.deployment - Deployment parameters
+# @param server.podAnnotations - CPQ server pod annotations
+# @param server.podSecurityContext - CPQ server pod security context
+# @param server.securityContext - CPQ server container security context
+# @param server.service - Service parameters
+# @param server.ingress - Ingress parameters
+# @param server.resources - CPQ server resources
+# @param server.autoscaling - Autoscaling parameters
+# @param server.initContainers - CPQ server init containers
+# @param server.jaegerAgent - Jaegar configuration parameters
+# @param server.environmentVariables - Environment variables
+# @param server.cryptography - CPQ server cryptography parameters
+# @param server.configuration - CPQ server configuration
+# @param server.headerConfiguration - CPQ server header configuration
+server:
+  enabled: true
+
+  # @section deployment - Deployment parameters
+  #
+  # @param server.deployment.replicaCount - Number of pods to deploy
+  # @param server.deployment.name - Deployment metadata name
+  # @param server.deployment.label - Deployment label
+  # @param server.deployment.image - Image parameters
+  # @param server.deployment.containerPort - Port where CPQ server will be running
+  deployment:
+    # @param replicaCount - Number of pods to deploy
+    #
+    # If autoscaling is enabled then the server.autoscaling.minReplicas parameter will be used instead
+    replicaCount: 1
+    name: cpq-server-deployment
+    label: cpq-server
+
+    # @section image - Image parameters
+    #
+    # @param server.deployment.image.pullPolicy - Image pull policy
+    # @param server.deployment.image.imagePullSecrets - Image pull secrets
+    # @param.server.deployment.image.repo - Image repository
+    # @param.server.deployment.image.tag - Image tag
+    image:
+      pullPolicy: IfNotPresent
+
+      # @param imagePullSecrets
+      # Optionally specify an array of image pull secrets. However, secrets must be manually created before deployment
+      #
+      # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+      #
+      # Example:
+      # imagePullSecrets:
+      #   - myRegistryKeySecretName
+      imagePullSecrets: []
+
+      # @param repo - Image repository
+      #
+      # The repo parameter is required and needs to be valid otherwise, the deployment will fail
+      repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/cpq-server
+
+      # @param tag - Image tag
+      #
+      # The tag parameter is required with a valid value otherwise, the deployment will fail
+      tag: 4.3.2
+
+    containerPort: 9001
+
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9001"
+    prometheus.io/path: "/api/metrics"
+    sidecar.jaegertracing.io/inject: "true"
+
+  # @param podSecurityContext - Pod security context
+  #
+  # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  podSecurityContext:
+    runAsUser: 1001 # default user
+    runAsGroup: 0 # root user
+
+  # @param securityContext - Container security context
+  #
+  # If you want to specify the container, remove the curly braces after 'securityContext:', add the security parameters you wish to use and adjust the
+  # the values as necessary
+  #
+  # Ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  securityContext: {}
+
+  # @section service - Service parameters
+  #
+  # @param server.service.name - Service metadata name
+  # @param server.service.type - Publishing service types
+  # @param server.service.port - Exposed port
+  # @param server.service.targetPort - Target container port
+  service:
+    name: cpq-server-service
+
+    # @param type - Publishing service types
+    #
+    # There are different types of services that you can use but we recommend that you use ClusterIP
+    #
+    # Ref: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+    type: ClusterIP
+    port: 9001
+    targetPort: 9001
+
+  # @section ingress - Ingress parameters
+  #
+  # @param server.ingress.enabled - Flag whether or not to deploy ingress for CPQ client
+  # @param server.ingress.name - Name of the ingress deployment
+  # @param server.ingress.hostName - CPQ server domain name
+  # @param server.ingress.path - CPQ server domain path
+  # @param server.ingress.pathType - Ingress path type
+  # @param server.ingress.annotations - Ingress annotations
+  # @param server.ingress.tls - Ingress TLS parameters
+  ingress:
+    enabled: true
+    name: cpq-server-ingress
+    hostName: "cpq-server-csd-dev-cluster.internal.delivery.hansencx.com"
+    path: /api
+
+    # @param pathType - Ingress path type
+    #
+    # The path in an ingress is required to have a corresponding path type. Paths, which do not include an explicit path will fail validation
+    #
+    # Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types
+    pathType: Prefix
+
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/auth-tls-secret: "" #<namespace>/<api-gateway-secret-name>
+      nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+
+    # @section tls - Ingress TLS parameter
+    #
+    # @param server.ingress.tls.enabled - Flag indicating whether or not to use tls in the ingress
+    # @param server.ingress.tls.secretName Name of the secret that has the TLS certificate
+    tls:
+      enabled: false
+      secretName: ""
+
+  # @param resources - CPQ server resources
+  #
+  # We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts
+  # run on environments with little resources, such as Minikube. If you want to specify resources, remove the curly braces after 'limits:' and 'requests:'
+  # Then set the limits and requests based on the examples
+  #
+  # @param server.resources.limits - The resource limits
+  # @param server.sources.requests - The requested resource
+  resources:
+    limits:
+      cpu: 250m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  # @section autoscaling - Autoscaling parameters
+  #
+  # @param server.autoscaling.enabled - Flag indicating whether or not to deploy the HPA for CPQ server
+  # @param server.autoscaling.name - Name of the autoscaling deployment
+  # @param server.autoscaling.minReplicas - Minimum number of replicas
+  # @param server.autoscaling.maxReplicas - Maximum number of replicas
+  # @param server.autoscaling.metrics - Metrics for the CPQ server HPA
+  # @param.server.autoscaling.behavior - Behavior for the CPQ server HPA
+  autoscaling:
+    enabled: false
+    name: cpq-server-autoscaling
+    minReplicas: 1
+    maxReplicas: 4
+
+    # @param metrics - Metrics for the CPQ server HPA
+    #
+    # If you wish to specify the metrics when autoscaling is enabled, remove the square brackets after 'metrics:' and specify an array of metrics
+    #
+    # Default metrics have been set using the structure that is expected if you are using 'autoscaling/v2' as the 'apiVersion'
+    #
+    # If you are using 'autoscaling/v2beta1' as the 'apiVersion', please see the below example on how to structure the array of metrics:
+    #
+    # metrics:
+    #   - type: Resource
+    #     resource:
+    #      name: cpu
+    #      targetAverageUtilization: 80
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
+
+    # @param behavior - Behavior for the CPQ server HPA
+    #
+    # Scaling on behavior is only supported on Kubernetes v1.23 [stable]. If you are on a lower version then the behavior property will not be applied
+    # to the CPQ server HPA.
+    #
+    # @param server.autoscaling.behavior.scaleDown - HPA scale down behavior
+    # @param server.autoscaling.behavior.scaleUp - HPA scale up behavior
+    behavior:
+      # @section scaleDown - HPA scale down behavior
+      #
+      # @param server.autoscaling.behavior.scaleDown.stabilizationWindowSeconds - Stabilization window in seconds
+      # @param server.autoscaling.behavior.scaleDown.policies - Scaling down behavior policies
+      scaleDown:
+        stabilizationWindowSeconds: 300
+
+        # @param policies - Scaling down behavior policies
+        #
+        # If you wish to specify the policies when autoscaling is enabled, remove the square brackets after 'policies' and specify an array of policies
+        #
+        # Example with default values:
+        # policies:
+        #   - type: Percent
+        #     value: 100
+        #     periodSeconds: 15
+        policies: []
+
+      # @section scaleUp - HPA scale up behavior
+      #
+      # @param server.autoscaling.behavior.scaleUp.stabilizationWindowSeconds - Stabilization window in seconds
+      # @param server.autoscaling.behavior.scaleUp.policies - Scaling up behavior policies
+      scaleUp:
+        stabilizationWindowSeconds: 0
+
+        # @param policies - Scaling up behavior policies
+        #
+        # If you wish to specify the policies when autoscaling is enabled, remove the square brackets after 'policies' and specify an array of policies
+        #
+        # Example with default values:
+        # policies:
+        #   - type: Percent
+        #     value: 100
+        #     periodSeconds: 15
+        #   - type: Pods
+        #     value: 4
+        #     periodSeconds: 15
+        policies: []
+
+  # @param initContainers - CPQ server init containers
+  #
+  # If you wish to specify init-containers to install any CPQ plugins, remove the square brackets after 'initContainers:' and
+  # specify an array of init-containers
+  #
+  # Example:
+  # initContainers:
+  #   - name: context-provider-registrations # Name of the init-container
+  #     image:
+  #       repo: cpq/plugins/contextproviderregistrations # Image repository
+  #       tag: 4.2.0 # Image tag
+  #     volumeMount:
+  #       name: context-provider-registrations-volume # Name of the volume
+  #       path: /contextProviderRegistrations # Mount path for the init-container
+  #       readOnly: false
+  initContainers:
+     - name: context-provider-registrations 
+       image:
+         repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/plugins
+         tag: contextprovider4.3.0_1
+       volumeMount:
+         name: cpq-plugins-contextproviderregistrations
+         path: /contextProviderRegistrations
+         readOnly: false
+     - name: portfolio-inventory-adapter
+       image:
+         repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/plugins
+         tag: portfolioinventoryadapter4.3.0.2
+       volumeMount:
+         name: portfolio-inventory-adapter
+         path: /portfolioInventoryAdapter
+         readOnly: false
+     - name: limit-provider-plugin
+       image:
+         repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/plugins
+         tag: limitproviderplugin4.3.0_1
+       volumeMount:
+         name: limit-provider-plugin
+         path: /LimitProviderPlugin
+         readOnly: false
+     - name: financial-summary-provider-plugin
+       image:
+         repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/plugins
+         tag: financialsummaryproviderpluginr4.3.0_1
+       volumeMount:
+         name: financial-summary-provider-plugin
+         path: /FinancialSummaryProviderPlugin
+         readOnly: false
+     - name: sigma-order-management-adapter
+       image:
+         repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/plugins
+         tag: sigmaordermanagementadapter4.3.0_1
+       volumeMount:
+         name: sigma-order-management-adapter
+         path: /SigmaOrderManagementAdapter
+         readOnly: false
+     - name: docu-sign-plugin-adapter
+       image:
+         repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/plugins
+         tag: docusignplugin4.3.0_1
+       volumeMount:
+         name: docusign
+         path: /DocuSignPlugin
+         readOnly: false
+
+  # @section jaegerAgent - Jaegar configuration parameters
+  #
+  # @param server.jaegerAgent.port - Jaegar agent exposed port
+  jaegerAgent:
+    port: 6832
+
+  environmentVariables:
+    # The JAEGER_AGENT_HOST and JAEGER_AGENT_PORT environment variables are mandatory for Jaeger to monitor CPQ server. If you remove these
+    # environment variables then Jaeger will no longer monitor CPQ server
+    - name: JAEGER_AGENT_HOST
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    - name: JAEGER_AGENT_PORT
+      value: "6832"
+    - name: PI_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: pi-client-id
+            optional: true
+    - name: PI_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: pi-client-secret
+            optional: true
+    - name: OM_IDP_SECRET
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: om-client-secret
+            optional: true
+    - name: OM_IDP_CLIENT_ID
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: om-client-id
+            optional: true
+    - name: DOCSING_USERNAME
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: docsing-username
+            optional: true
+    - name: DOCSING_PASSWORD
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: docsing-password
+            optional: true
+    - name: DOCSING_INTEGRATION_KEY
+      valueFrom:
+        secretKeyRef:
+            name: cpq-integration
+            key: docsing-integration-id
+            optional: true
+    - name: PI_IDP_URI_PREFIX
+      value: "https://hansen-csd-dev.auth.us-east-2.amazoncognito.com"
+    - name: PI_URI_PREFIX
+      value: "https://pi-core-csd-dev-cluster.internal.delivery.hansencx.com"
+    - name: OM_IDP_TOKEN_ENDPOINT
+      value: "https://hansen-csd-dev.auth.us-east-2.amazoncognito.com"
+    - name: OM_API_ENDPOINT_PREFIX
+      value: "https://om-api-csd-dev-cluster.internal.delivery.hansencx.com"
+    - name: DOCSING_BASE_URL
+      value: "https://demo.docusign.net/restapi"
+    - name: NODE_TLS_REJECT_UNAUTHORIZED
+      value: "0"
+    - name: DATABASE_USERNAME
+      valueFrom:
+        secretKeyRef:
+            name: cpq-environment-variables
+            key: DATABASE_USERNAME
+            optional: true
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+            name: cpq-environment-variables
+            key: DATABASE_PASSWORD
+            optional: true
+    # Environment variables that we want to include in the CPQ server deployment. These variable values can be
+    # set using secret values. If you are going to use values from a secret, make sure that you have first deployed the secrets to the cluster
+    # before deploying CPQ. If you want to set environment variables remove the curly braces and see below for an example
+    # - name: ENVIRONMENT_VARIABLE_NAME
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: Name_of_secret_deployed_in_cluster
+    #       key: Name_of_key_in_secret
+    #       optional: false # When set to true the secret must be deployed and include the supplied key"
+
+  # @section cryptography
+  #
+  # Before you can enable cryptography in CPQ you will have to create a secret from the pem file you wish to use
+  #
+  # @param server.cryptography.enabled - Flag whether or not the configuration in the JSON configuration is encrypted
+  # @param server.cryptography.secretName - Name of the PEM secret
+  # @param server.cryptography.path - Path to the PEM file in the CPQ server container
+  # @param server.cryptography.fileName - Name of the PEM file in the CPQ server container
+  cryptography:
+    enabled: false
+    secretName: "name_of_secret_deployed_in_cluster"
+    path: "/path/to/directory/containing/pem/file/deployed/in/cluster" # Example /app/
+    fileName: "name_of_pem_file_including_extension" # Example private_key.pem
+
+  # @section configuration - CPQ server configuration
+  #
+  # @param server.configuration.file - CPQ server configuration via JSON configuration files
+  # @param server.configuration.contents - CPQ server configuration contents in YAML format
+  configuration:
+    # @param file - CPQ server configuration via JSON configuration files
+    #
+    # Deprecated: We do not recommend using the JSON configuration files to configure CPQ server. We recommend setting the configuration under
+    # server.configuration.contents in an overriding values.yaml file.
+    #
+    # We will be removing the configuration JSON files in the next 4.x release
+    #
+    # @param server.configuration.file.enabled - Flag indicating whether or not CPQ server will be configured using the JSON configuration files
+    # @param server.configuration.file.path - Path to the JSON configuration files in the Helm charts
+    file:
+      enabled: true
+      path: "configuration/server/configuration.json"
+    contents:
+      sigma-cpq-services-server:
+        catalogServicesConnection:
+          hostName: "##catalog services host name##"
+          port: 80
+          basePath: "/SigmaCatalogServices"
+          isSecure: false
+          timeout: 60000
+          retryNumber: 1
+          majorVersion: 3
+          authentication:
+            enabled: false
+            authenticationType: "##enterAuthenticationType##"
+            options:
+              authenticationFlow: "##enterOidcAuthenticationFlow##"
+              clientId: "##enterClientId##"
+              clientSecret: "##enterClientSecret##"
+              idpUsername: "##enterIdpusername##"
+              idpPassword: "##enterIdppassword##"
+              headerName: "##enterIdpHeaderName##"
+              scope: "##enterConfiguredScopes##"
+              idpAuthenticationEndpointUrl: "##enterIdpAuthenticationEndpointUrl##"
+              requestMethod: "##enterRequestMethod##"
+              requireClientCredentialsInAuthHeader: "##setToTrueIfClientCredentialsReuqiredInHeader##"
+        security:
+          allowSelfSignedCertificates: true
+          claimsFromTokenWithoutVerification: false
+          claimsFromAccessToken: false
+          enableSecurity: false
+          userNameClaim: name
+          performTokenIntrospection: false
+          tokenIntrospectionSettings:
+            clientId: "##insertYourCPQServerClientId##"
+            clientSecret: ""
+            introspectionScopes:
+              - "##insertIntrospectionScopes##"
+            tokenGenerationEndpoint: "##insertYourTokenGenerationEndpoint##"
+            tokenIntrospectionEndpoint: "##insertYourTokenIntrospectionEndpoint##"
+          tokenDecoderSettings:
+            jwksEndpoint: "##insertYourJwksEndpoint##"
+          userInfoRequestSettings:
+            userInfoEndpoint: "##insertYourUserInfoEndpoint##"
+        sharedDataAccess:
+          protocol: mongodb+srv
+          server: localhost
+          port: "27017"
+          writeConcern: 1
+          writeConcernTimeout: 5000
+          journal: false
+          mongoDbAuthenticationSource:
+            enableAuthSourceDb: false
+            authMechanism: SCRAM-SHA-1
+            mongoUsername: ""
+            mongoPassword: ""
+            mongoAdminDb: ""
+            x509UserName: ""
+          ssl:
+            enableSSL: false
+            sslValidate: true
+            sslCAFile: D:\CPQ\cert\cafile.pem
+            sslPemCertificate: D:\CPQ\cert\client.pem
+            sslPemKeyFile: D:\CPQ\cert\client.pem
+            sslPemPassword: kspass
+          mongoClustering:
+            readConcern: local
+            readPreference: primary
+            replication:
+              enabled: false
+              replicaSetName: rs1
+              connectWithNoPrimary: false
+              replicationHostAndPort:
+                - replication-host-primary.com:27017
+                - replication-host-secondary.com:27018
+                - replication-host-tertiary.com:27019
+            mongoSharding:
+              enabled: false
+              shardingHostAndPort:
+                - sharding-1.domain.com:47017
+                - sharding-2.domain.com:47018
+        loggingOptions:
+          appenders:
+            console:
+              type: console
+              layout:
+                type: pattern
+                pattern:
+                  "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p
+                  %c --- %m"
+            CatalogServicesRequests:
+              type: file
+              filename: "/logs/CatalogServicesRequests.log"
+              layout:
+                type: pattern
+                pattern:
+                  "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p
+                  %c --- %m"
+            CPQServer:
+              type: file
+              filename: "/logs/CPQServer.log"
+              layout:
+                type: pattern
+                pattern:
+                  "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p
+                  %c --- %m"
+            WebClientErrors:
+              type: file
+              filename: "/logs/WebClientErrors.log"
+              layout:
+                type: pattern
+                pattern:
+                  "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p
+                  %c --- %m"
+            HTTPErrors:
+              type: file
+              filename: "/logs/HTTPErrors.log"
+              layout:
+                type: pattern
+                pattern:
+                  "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p
+                  %c --- %m"
+          categories:
+            CatalogServicesRequests:
+              appenders:
+                - console
+                - CatalogServicesRequests
+              level: WARN
+            CPQServer:
+              appenders:
+                - console
+                - CPQServer
+              level: INFO
+            default:
+              appenders:
+                - console
+              level: WARN
+            WebClient:
+              appenders:
+                - WebClientErrors
+              level: WARN
+            HTTPErrors:
+              appenders:
+                - console
+                - HTTPErrors
+              level: WARN
+            SysTimer:
+              appenders:
+                - console
+              level: INFO
+        keepAliveTimeout:
+          Enter timeout in ms.This setting prevents unused connections from
+          hanging around for too long. It sets how long your server should wait for new
+          requests from clients.
+        enableTracing: false
+        enableMonitoring: false
+        samplingType:
+          type: const
+          param: 1
+        guestCustomerDetails:
+          id: 624bb299-4b7e-4f15-9c6f-93fad6b429ce
+          accountName: Anonymous User
+          customerContact: []
+      sigma-cpq-services-event-framework:
+        clientType: kafka
+        brokers:
+          - host: localhost
+            port: 9092
+        storeName: CPQEventStore
+        enabled: false
+        ssl:
+          enabled: false
+        events:
+          - eventType: quoteCreated
+            eventPayloadType: none
+          - eventType: quoteRemoved
+            eventPayloadType: none
+          - eventType: quoteUpdated
+            eventPayloadType: none
+          - eventType: quoteNameUpdated
+            eventPayloadType: none
+          - eventType: quoteItemCreated
+            eventPayloadType: none
+          - eventType: quoteItemUpdated
+            eventPayloadType: none
+          - eventType: quoteItemRemoved
+            eventPayloadType: none
+          - eventType: quoteItemNameUpdated
+            eventPayloadType: none
+          - eventType: orderCreated
+            eventPayloadType: none
+          - eventType: orderItemUpdated
+            eventPayloadType: none
+          - eventType: orderStatusUpdated
+            eventPayloadType: none
+          - eventType: orderSubmitted
+            eventPayloadType: none
+          - eventType: quoteRevised
+            eventPayloadType: none
+          - eventType: quoteStatusUpdated
+            eventPayloadType: none
+          - eventType: quoteMigrated
+            eventPayloadType: none
+          - eventType: orderHeaderUpdated
+            eventPayloadType: none
+      sigma-cpq-services-status:
+        includeDocs: true
+        enableSecurityForDocs: false
+        swaggerDocs:
+          openIdConnectScopes: openid user_name permission
+          openIdConnectAuthorizationUrl: "##insertYourAuthorizationUrl##"
+
+  # @section headerConfiguration - CPQ server header configuration
+  #
+  # @param server.headerConfiguration.file - CPQ server header configuration via JSON configuration files
+  # @param.server.headerConfiguration.contents - CPQ server header configuration contents in YAML format
+  headerConfiguration:
+    # @param file - CPQ server header configuration via JSON configuration file
+    #
+    # Deprecated: We do not recommend using the JSON configuration files to configure the headers in CPQ server. We recommend setting the
+    # configuration under server.headerConfiguration.contents in an overriding values.yaml file.
+    #
+    # We will be removing the configuration JSON files in the next 4.x release
+    #
+    # @param server.headerConfiguration.file.enabled - Flag indicating whether or not CPQ server header configuration will be configured using the JSON configuration files
+    # @param server.headerConfiguration.file.path - Path to the JSON configuration files in the Helm charts
+    file:
+      enabled: false
+      path: "configuration/server/headerConfiguration.json"
+    contents:
+      headers:
+        order: []
+        customer: []
+
+# @section CPQ client and server pods service account
+#
+# @param serviceAccount.create - Specifies whether a service account should be created
+# @param serviceAccount.annotations - Annotations for service account
+# @param serviceAccount.name - Name of the service account
+serviceAccount:
+  create: false
+  annotations: {}
+
+  # @param name - Name of the service account
+  #
+  # If not set and create is true, a name is generated using the full name template
+  name: ""

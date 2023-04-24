@@ -1,0 +1,23 @@
+{{- if .Values.client.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.client.service.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/component: Server
+    app.kubernetes.io/part-of: CPQ
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    run: {{ .Values.client.service.name }}
+spec:
+  selector:
+    app.name: {{ .Values.client.deployment.label }}
+  type: {{ .Values.client.service.type }}
+  ports:
+    - port: {{ .Values.client.service.port }}
+      name: http
+      targetPort: {{ .Values.client.service.targetPort }}
+{{- end }}

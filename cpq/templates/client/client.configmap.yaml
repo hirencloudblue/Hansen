@@ -1,0 +1,24 @@
+{{- if .Values.client.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cpq-client-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/component: Client
+    app.kubernetes.io/part-of: CPQ
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  {{if .Values.client.configuration.file.enabled}}
+  systemConfiguration.json: |-
+{{ .Files.Get .Values.client.configuration.file.path | indent 4 }}
+  {{end}}
+
+  {{if not .Values.client.configuration.file.enabled}}
+   systemConfiguration.json: |-
+{{- include "cpq-client-configuration" . | nindent 4 }}
+  {{end}}
+{{- end }}

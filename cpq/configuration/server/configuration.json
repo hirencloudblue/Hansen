@@ -1,0 +1,354 @@
+{
+    "sigma-cpq-services-server": {
+        "catalogServicesConnection": {
+            "hostName": "cs-core-csd-dev-cluster.internal.delivery.hansencx.com",
+            "port": 443,
+            "basePath": "",
+            "isSecure": true,
+            "timeout": 60000,
+            "retryNumber": 1,
+            "majorVersion": 3,
+            "authentication": {
+                "enabled": false,
+                "authenticationType": "OpenID-Connect",
+                "options": {
+                    "authenticationFlow": "clientCredentials",
+                    "clientId": "7taqfr33p311gruktjoo4emca3",
+                    "clientSecret": "1hpngu8eaj61q6vhi701irlfjfnh17ua8rnp9i6q8tj3v0nqusjn",
+                    "idpUsername": "##enterIdpusername##",
+                    "idpPassword": "##enterIdppassword##",
+                    "headerName": "Authorization",
+                    "scope": "hansen-resource-server/HansenCS:GeneralAccess",
+                    "idpAuthenticationEndpointUrl": "https://hansen-csd-dev.auth.us-east-2.amazoncognito.com/oauth2/token",
+                    "requestMethod": "POST",
+                    "requireClientCredentialsInAuthHeader": "##setToTrueIfClientCredentialsReuqiredInHeader##"
+                }
+            }
+        },
+        "security": {
+            "allowSelfSignedCertificates": true,
+            "claimsFromTokenWithoutVerification": true,
+            "claimsFromAccessToken": false,
+            "enableSecurity": true,
+            "userNameClaim": "name",
+            "performTokenIntrospection": false,
+            "tokenIntrospectionSettings": {
+              "clientId": "7taqfr33p311gruktjoo4emca3",
+              "clientSecret": "1hpngu8eaj61q6vhi701irlfjfnh17ua8rnp9i6q8tj3v0nqusjn",
+              "introspectionScopes": [
+                "##insertIntrospectionScopes##"
+              ],
+              "tokenGenerationEndpoint": "https://hansen-csd-dev.auth.us-east-2.amazoncognito.com/oauth2/token",
+              "tokenIntrospectionEndpoint": "https://hansen-csd-dev.auth.us-east-2.amazoncognito.com/oauth2/introspect"
+            },
+            "tokenDecoderSettings": {
+              "jwksEndpoint": "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_n83FNjkyq/.well-known/jwks.json"
+            },
+            "userInfoRequestSettings": {
+              "userInfoEndpoint": "https://hansen-csd-dev.auth.us-east-2.amazoncognito.com/oauth2/userInfo"
+            }
+          },
+        "sharedDataAccess": {
+            "exactConnectionString": "",
+            "protocol": "mongodb+srv",
+            "server": "cluster1.jbytn.mongodb.net",
+            "port": "27017",
+            "writeConcern": 1,
+            "writeConcernTimeout": 5000,
+            "journal": false,
+            "connectionPool": {
+                "maxPoolSize": 50,
+                "minPoolSize": 0
+            },
+            "mongoDbAuthenticationSource": {
+                "enableAuthSourceDb": true,
+                "authMechanism": "SCRAM-SHA-1",
+                "mongoAdminDb": "admin",
+                "x509UserName": ""
+            },
+            "ssl": {
+                "enableSSL": false,
+                "sslValidate": true,
+                "sslCAFile": "D:\\CPQ\\cert\\cafile.pem",
+                "sslPemCertificate": "D:\\CPQ\\cert\\client.pem",
+                "sslPemKeyFile": "D:\\CPQ\\cert\\client.pem",
+                "sslPemPassword": "kspass"
+            },
+            "mongoClustering": {
+                "readConcern": "local",
+                "readPreference": "primary",
+                "replication": {
+                    "enabled": false,
+                    "replicaSetName": "rs1",
+                    "connectWithNoPrimary": false,
+                    "replicationHostAndPort": [
+                        "replication-host-primary.com:27017",
+                        "replication-host-secondary.com:27018",
+                        "replication-host-tertiary.com:27019"
+                    ]
+                },
+                "mongoSharding": {
+                    "enabled": false,
+                    "shardingHostAndPort": [
+                        "sharding-1.domain.com:47017",
+                        "sharding-2.domain.com:47018"
+                    ]
+                }
+            }
+		},
+		"phaseConfiguration": {
+           "quote": {
+               "phases": [
+                   {
+                       "id":"QS1",
+                       "name": "Quote Phase",
+                       "csCodes": ["QuotePhase"],
+                       "sequence": 0
+                   }
+               ]
+           },
+           "order": {
+               "phases": [
+                   {
+                       "id":"OS1",
+                        "name": "Order Stage 1",
+                        "csCodes": ["Phase1"],
+                        "sequence": 0,
+                        "isDefault": true
+                    },
+                    {
+                      "id":"DocuSign",
+                      "name": "DocuSign",
+                      "csCodes": ["Docusign"],
+                      "sequence": 1
+                     },
+                    {
+                        "id":"OS2",
+                        "name": "Order State 2",
+                        "csCodes": ["Phase2"],
+                        "sequence": 1
+                     },
+                     {
+                         "id":"OS3",
+                         "name": "Order State 3",
+                         "csCodes": ["Phase3"],
+                         "sequence": 2
+                     },
+                    {
+                       "id":"OS4",
+                       "name": "Order State 4",
+                       "csCodes": ["Phase4"],
+                       "sequence": 3
+                    },
+                    {
+                       "id":"OS5",
+                       "name": "Order State 5",
+                       "csCodes": ["Phase5"],
+                       "sequence": 4
+                    },
+                    {
+                       "id":"OS6",
+                       "name": "Order Stage 6",
+                       "csCodes": ["MergePhase1", "MergePhase2"],
+                       "sequence": 5
+                    },
+                    {
+                       "id":"OS7",
+                       "name": "Order State 7",
+                       "csCodes": ["MergePhase3"],
+                       "sequence": 6
+                    }
+               ]
+            }
+        },
+        "loggingOptions": {
+            "appenders": {
+                "console": {
+                  "type": "console",
+                  "layout": {
+                    "type": "pattern",
+                    "pattern": "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p %c --- %m"
+                  }
+                },
+                "CatalogServicesRequests": {
+                  "type": "file",
+                  "filename": "/logs/CatalogServicesRequests.log",
+                  "layout": {
+                    "type": "pattern",
+                    "pattern": "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p %c --- %m"
+                  }
+                },
+                "CPQServer": {
+                  "type": "file",
+                  "filename": "/logs/CPQServer.log",
+                  "layout": {
+                    "type": "pattern",
+                    "pattern": "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p %c --- %m"
+                  }
+                },
+                "WebClientErrors": {
+                  "type": "file",
+                  "filename": "/logs/WebClientErrors.log",
+                  "layout": {
+                    "type": "pattern",
+                    "pattern": "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p %c --- %m"
+                  }
+                },
+                "HTTPErrors": {
+                  "type": "file",
+                  "filename": "/logs/HTTPErrors.log",
+                  "layout": {
+                    "type": "pattern",
+                    "pattern": "%d{yyyy-MM-dd hh:mm:ss.SSS} %X{correlationId} %X{requestId} %p %c --- %m"
+                  }
+                }
+            },
+            "categories": {
+                "CatalogServicesRequests": {
+                  "appenders": [
+                    "console",
+                    "CatalogServicesRequests"
+                  ],
+                  "level": "WARN"
+                },
+                "CPQServer": {
+                  "appenders": [
+                    "console",
+                    "CPQServer"
+                  ],
+                  "level": "INFO"
+                },
+                "default": {
+                  "appenders" : [
+                    "console"
+                  ],
+                  "level": "WARN"
+                },
+                "WebClient": {
+                  "appenders" : [
+                    "WebClientErrors"
+                  ],
+                  "level": "WARN"
+                },
+                "HTTPErrors": {
+                  "appenders" : [
+                    "console",
+                    "HTTPErrors"
+                  ],
+                  "level": "WARN"
+                },
+                "SysTimer": {
+                  "appenders" : [
+                    "console"
+                  ],
+                  "level": "INFO"
+                }
+            }
+        },
+        "keepAliveTimeout": "Enter timeout in ms.This setting prevents unused connections from hanging around for too long. It sets how long your server should wait for new requests from clients.",
+        "enableTracing": true,
+        "enableMonitoring": true,
+        "samplingType": {
+          "type": "const",
+          "param": 1
+        },
+        "cryptography": {
+            "enabled": false,
+            "privateKeyLocation": "/app/private.pem",
+            "privateKeyPassphrase": ""
+        },
+        "guestCustomerDetails": {
+          "id": "624bb299-4b7e-4f15-9c6f-93fad6b429ce",
+          "accountName": "Anonymous User",
+          "customerContact": []
+      }
+    },
+    "sigma-cpq-services-event-framework": {
+        "clientType": "kafka",
+        "brokers": [
+            {
+                "host": "localhost",
+                "port": 9092
+            }
+        ],
+        "storeName": "CPQEventStore",
+        "enabled": false,
+        "ssl": {
+            "enabled": false
+        },
+        "events": [
+            {
+                "eventType": "quoteCreated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteRemoved",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteNameUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteItemCreated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteItemUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteItemRemoved",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteItemNameUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "orderCreated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "orderItemUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "orderStatusUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "orderSubmitted",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteRevised",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteStatusUpdated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "quoteMigrated",
+                "eventPayloadType": "none"
+            },
+            {
+                "eventType": "orderHeaderUpdated",
+                "eventPayloadType": "none"
+            }
+        ]
+    },
+    "sigma-cpq-services-status": {
+      "includeDocs": true,
+      "enableSecurityForDocs":false,
+      "swaggerDocs": {
+        "openIdConnectScopes": "openid user_name permission",
+        "openIdConnectAuthorizationUrl": "##insertYourAuthorizationUrl##"
+      }
+    }
+}

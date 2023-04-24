@@ -1,0 +1,74 @@
+{{- if .Values.client.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.client.deployment.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/component: Client
+    app.kubernetes.io/part-of: CPQ
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/client/client.configmap.yaml") . | sha256sum }}
+spec:
+  {{- if not .Values.client.autoscaling.enabled }}
+  replicas: {{ .Values.client.deployment.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.name: {{ .Values.client.deployment.label }}
+  template:
+    metadata:
+      labels:
+        app.name: {{ .Values.client.deployment.label }}
+    spec:
+      {{- with .Values.client.deployment.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        {{- toYaml .Values.client.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: cpq-client-config-volume
+          configMap:
+            name: cpq-client-config
+        - name: tmp
+          emptyDir: {}
+      containers:
+      - name: {{ .Values.client.deployment.label }}
+        securityContext:
+          {{- toYaml .Values.client.securityContext | nindent 12 }}
+        image: "{{ .Values.client.deployment.image.repo }}:{{ .Values.client.deployment.image.tag }}"
+        imagePullPolicy: {{ .Values.client.deployment.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.client.deployment.containerPort }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: 9002
+          # Maximum of 5mins (30 * 10 = 300secs) to finish the start up
+          failureThreshold: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9002
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9002
+          failureThreshold: 3
+          periodSeconds: 30
+        resources:
+          {{- toYaml .Values.client.resources | nindent 12 }}
+        volumeMounts:
+          - mountPath: "/app/configuration/"
+            name: cpq-client-config-volume
+          - mountPath: "/tmp/"
+            name: tmp
+{{- end }}

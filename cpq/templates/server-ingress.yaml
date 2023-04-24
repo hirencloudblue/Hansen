@@ -1,0 +1,37 @@
+{{- if .Values.server.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.server.ingress.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/component: Routing
+    app.kubernetes.io/part-of: CPQ
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    {{- with .Values.server.ingress.annotations }}
+      {{- toYaml . | nindent 8 }}
+    {{- end }}
+spec:
+  rules:
+  - host: {{ .Values.server.ingress.hostName }}
+    http:
+      paths:
+      - path: {{ .Values.server.ingress.path }}
+        pathType: {{ .Values.server.ingress.pathType }}
+        backend:
+          service:
+            name: {{ .Values.server.service.name }}
+            port:
+              number: {{ .Values.server.service.port }}
+  {{- if .Values.server.ingress.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ .Values.server.ingress.hostName }}
+      secretName: {{ .Values.server.ingress.tls.secretName }}
+  {{- end }}
+{{- end }}
+

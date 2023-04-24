@@ -1,0 +1,59 @@
+{
+    "configuration": {
+        "system": {
+            "connections": [
+                {
+                    "name": "CpqServices",
+                    "hostName": "cpq-client-csd-dev-cluster.internal.delivery.hansencx.com",
+                    "port": 443,
+                    "basePath": "/api",
+                    "isSecure": true,
+                    "timeout": 100000,
+                    "retryNumber": 3
+                }
+            ],
+            "defaultDataPackets": [
+             {
+              "name": "browse",
+              "data": {
+                "rootClassificationId": "Selling_Category_Value",
+                "entityTypeId": "offer",
+                "displaySetId": "short",
+                "productTypes": "package,promotion,bundle",
+                "entityElementName": "Sales_Category",
+                "xsltCode": "offer_short",
+                "defaultClassificationGUID": "434100ae-a929-4ae3-b663-a4dd7fc77d27"
+              }
+             }
+	    ],
+            "realTimeRules": true,								   					  
+            "security": {
+                "clientSettings": {
+                  "allowLandingPage": true,
+                  "displayNameClaim": "name",
+                  "isEmbeddedClient": false,
+                  "showLogoutButton": false
+                },
+                "enableSecurity": true,
+                "useExternalAuthentication": false,
+                "openIdSettings": {
+                  "accessTokenExpiringNotificationTime": 60,
+                  "authority": "https://cognito-idp.us-east-2.amazonaws.com/us-east-2_n83FNjkyq",
+                  "baseUrl": "https://cpq-client-csd-dev-cluster.internal.delivery.hansencx.com",
+                  "client_id": "24fp7toja2rmh3qttbbl6qnhrp",
+                  "enableLogging": false,
+                  "filterProtocolClaims": false,
+                  "loadUserInfo": true,
+                  "includeIdTokenInSilentRenew": false,
+                  "monitorSession": true,
+                  "post_logout_redirect_uri": "/logout",
+                  "redirect_uri": "/callback",
+                  "response_type": "token id_token",
+                  "scope": "openid profile email",
+                  "silentRequestTimeout": 10000,
+                  "silent_redirect_uri": "/silentRenew"
+                }
+            }
+        }
+    }
+}
