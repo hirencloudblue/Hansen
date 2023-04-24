@@ -637,7 +637,7 @@ server:
             userInfoEndpoint: "##insertYourUserInfoEndpoint##"
         sharedDataAccess:
           protocol: mongodb+srv
-          server: localhost
+          server: poc.b1jtsn8.mongodb.net
           port: "27017"
           writeConcern: 1
           writeConcernTimeout: 5000
