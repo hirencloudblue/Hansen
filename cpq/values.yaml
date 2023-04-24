@@ -49,7 +49,8 @@ client:
       # @param repo - Image repository
       #
       # The repo parameter is required and needs to be valid otherwise, the deployment will fail
-      repo:167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/cpq-client 
+      
+      repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/cpq-client 
       # CPQ Client image name ##
 
       # @param tag - Image tag
@@ -336,12 +337,14 @@ server:
       # @param repo - Image repository
       #
       # The repo parameter is required and needs to be valid otherwise, the deployment will fail
-      repo: ## CPQ Server image name ##
+      repo: 167611410634.dkr.ecr.us-east-2.amazonaws.com/cpq/cpq-server
+      ## CPQ Server image name ##
 
       # @param tag - Image tag
       #
       # The tag parameter is required with a valid value otherwise, the deployment will fail
-      tag: ## CPQ Server image version ##
+      tag: 4.3.2
+      ## CPQ Server image version ##
 
     containerPort: 9001
 
