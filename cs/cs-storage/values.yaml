@@ -57,4 +57,4 @@ persistentVolumes:
         storage: 10Gi
         accessMode: ReadWriteMany
         provisioner: efs.csi.aws.com # This is provisioner specific to aws
-        fileSystemId: fs-b6959467 # This is a unique id of efs instance on aws, this will be customer specific
+        fileSystemId: fs-098fd096f2fcc4111 # This is a unique id of efs instance on aws, this will be customer specificis will be customer specific
