@@ -640,9 +640,9 @@ server:
           mongoDbAuthenticationSource:
             enableAuthSourceDb: false
             authMechanism: SCRAM-SHA-1
-            mongoUsername: ""
-            mongoPassword: ""
-            mongoAdminDb: ""
+            mongoUsername: "hansen"
+            mongoPassword: "hansen123"
+            mongoAdminDb: "admin"
             x509UserName: ""
           ssl:
             enableSSL: false
@@ -665,8 +665,8 @@ server:
             mongoSharding:
               enabled: false
               shardingHostAndPort:
-                - sharding-1.domain.com:47017
-                - sharding-2.domain.com:47018
+                - ac-mqigxz8-shard-00-01.b1jtsn8.mongodb.net:27017
+                - ac-mqigxz8-shard-00-00.b1jtsn8.mongodb.net:27017
         loggingOptions:
           appenders:
             console:
