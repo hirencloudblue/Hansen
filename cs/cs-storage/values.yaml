@@ -43,14 +43,14 @@ persistentVolumes:
     accessMode: ReadWriteOnce
     storage: 5Gi
     local: # This is a local PV setup for definining a hostPath on single node clusters ie. local kube
-      - create: true # Determines if to use pv locally
+      - create: false # Determines if to use pv locally
         name: cs-dev-pv # Name of pv
         storageClassName: manual
         storage: 10Gi
         accessMode: ReadWriteMany
         path: "/run/desktop/mnt/host/c/data" # Path to the local folder specific to local kubernetes running on docker.
     efs: # This is for efs storage needs to be set to true when deploying on aws
-      - create: false # This determines if to setup an efs pv on AWS
+      - create: true # This determines if to setup an efs pv on AWS
         name: cs-efs-pv # Name of pv
         storageClassName: cs-efs-sc
         reclaimPolicy: Retain
