@@ -20,7 +20,7 @@ service:
   port: 9002
   enableNodePort: false
 ingress:
-  enabled: true
+  enabled: false
   className: alb
   annotations:
       alb.ingress.kubernetes.io/scheme: internet-facing
